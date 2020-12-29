@@ -50,8 +50,10 @@ Jutils works in two steps. *Step 1* generates the TSV file representation of the
 _TSV file conversion_
 ```
 python3 jutils.py convert-results [ --mntjulip-dir | --leafcutter-dir | --majiq-dir | rmats-dir ] <dsprogram_result_dir>
+        options:
+        --out-dir      specify the output directory
 ```
-The command takes as input the directory containing the output from the specified DS tool, and generates a TSV file in the current(?) directory. 
+The command takes as input the directory containing the output from the specified DS tool, and generates a TSV file in the ./out directory, user can output directory by option `--out-dir`
 
 _Heatmap visualization_
 ```
@@ -108,8 +110,14 @@ The format of the BAM list file is shown [below](#inputoutput).
 _Venn diagram visualization_
 ```
 python3 jutils.py venn-diagram --tsv-file-list <tsv_file_list>
+        options:
+        --dpsi         cutoff for delta PSI (Percent Splice In)
+        --p-value      cutoff for differential test p-value
+        --q-value      cutoff for differential test q-value
+        --prefix        add prefix to the output file
+        --out-dir       specify the output directory
 ```
-The command above creates Venn diagram representations of gene sets from multiple TSV files, corresponding to multiple tools or comparisons. The format of the TSV file list is shown [below](#inputoutput).
+The command above creates Venn diagram representations of gene sets from multiple TSV files, corresponding to multiple tools or comparisons. The format of the TSV file list is shown [below](#inputoutput). User can filter the values by delta PSI, p-value, q-values with options `--dpsi`, `--p-value`, `--q-value`.
 
 #### Usage customized by program
 
