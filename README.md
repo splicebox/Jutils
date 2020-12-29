@@ -189,7 +189,6 @@ python3 jutils.py heatmap --tsv-file 'mntjulip_DSA_results.tsv' \
 
 Sashimi visualizations use the raw read counts per sample, as before:
 ```
-####### sashimi plot : 
 python3 jutils.py convert-results --mntjulip-dir ${result_dir}
 
 # sashimi plot with bams
