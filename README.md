@@ -6,7 +6,7 @@ Described in:
 
    Yang G, Cope L, He Z, and Florea L. (2020) Jutils: A visualization toolkit for differential alternative splicing events, *Submitted*.
 
-Supplementary scripts and data described in the article can be found in the 'data' directory.
+Supplementary scripts ([test_jutils.sh](https://github.com/splicebox/Jutils/blob/master/data/test_jutils.sh)) and data described in the article can be found in the '[data](https://github.com/splicebox/Jutils/tree/master/data)' directory.
 
 ```
 Copyright (C) 2020-2021, and GNU GPL v3.0, by Guangyu Yang, Liliana Florea
