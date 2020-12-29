@@ -6,6 +6,8 @@ Described in:
 
    Yang G, Cope L, He Z, and Florea L. (2020) Jutils: A visualization toolkit for differential alternative splicing events, *Submitted*.
 
+Supplementary scripts and data described in the article can be found in the 'data' directory.
+
 ```
 Copyright (C) 2020-2021, and GNU GPL v3.0, by Guangyu Yang, Liliana Florea
 ```
