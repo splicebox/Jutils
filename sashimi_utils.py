@@ -15,7 +15,6 @@ def sashimi_polt_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
         # ReadCount1, ReadCount2, PSI
         items = line.strip().split('\t')
         _gene_name, _group_id, label, _strand = items[0], items[1], items[4], items[5]
-        _strand = '+' if _strand == '.' else _strand
         if _group_id == group_id:
             strand = _strand
             chr, start, end = parse_coordinates(label)
@@ -34,6 +33,8 @@ def sashimi_polt_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
     label_dict, id_list = OrderedDict(), []
     if strand == '-':
         bam_dict['-'] = OrderedDict()
+    if not strand:
+        strand = '+'
     with open(meta_file, 'r') as f:
         for line in f:
             id, overlay_level = line.strip().split('\t')
@@ -420,6 +421,7 @@ def read_gtf(file, c):
                     exons.setdefault(transcript_id, []).append((max(el_start, start), min(end, el_end), strand))
 
     return transcripts, exons
+
 
 
 def make_introns(transcripts, exons, intersected_introns=None):
