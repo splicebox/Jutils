@@ -18,14 +18,14 @@ def get_arguments():
     r_parser.add_argument('--rmats-dir', type=str, help='The directory contains the *.ReadsOnTargetAndJunctionCounts.txt and *.JunctionCountOnly.txt.')
     r_parser.add_argument('--mntjulip-dir', type=str, help='The directory contains diff_spliced_introns.txt, diff_spliced_groups.txt, diff_introns.txt and intron_data.txt')
     r_parser.add_argument('--majiq-dir', type=str, help='The directory contains *.deltapsi.tsv')
-    r_parser.add_argument('--out-dir', type=str, default='./out', help='The output directory')
+    r_parser.add_argument('--out-dir', type=str, default='./out', help='Specify the output directory')
 
     v_parser = subparser.add_parser('venn-diagram', help='')
     parser_dict['venn-diagram'] = v_parser
     v_parser.add_argument('--tsv-file-list', type=str, help='A file that contains path of tsv files')
     v_parser.add_argument('--p-value', type=float, default=0.05, help='Provide a p-value cutoff (default 0.05)')
     v_parser.add_argument('--q-value', type=float, default=1.0, help='Provide a q-value cutoff (default 1.0)')
-    v_parser.add_argument('--out-dir', type=str, default='./out', help='The output directory')
+    v_parser.add_argument('--out-dir', type=str, default='./out', help='Specify the output directory')
     v_parser.add_argument('--dpsi', type=float, default=0.05, help='Provide a |dPSI| cutoff (default 0.05)')
     v_parser.add_argument('--prefix', type=str, default='', help='Add prefix to the output file')
 
@@ -37,9 +37,9 @@ def get_arguments():
     h_parser.add_argument('--q-value', type=float, default=1.0, help='Provide a q-value cutoff (default 1.0)')
     h_parser.add_argument('--dpsi', type=float, default=0.05, help='Provide a |dPSI| cutoff (default 0.05)')
     h_parser.add_argument('--avg', type=float, default=0., help='Provide a cutoff on estimated read counts for DSA results (default 0.)')
-    h_parser.add_argument('--fold-change', type=float, default=0., help='Provide a |dPSI| cutoff (default 0.)')
-    h_parser.add_argument('--aggregate', action='store_true', default=False, help='Debug mode for showing more information.')
-    h_parser.add_argument('--out-dir', type=str, default='./out', help='The output directory')
+    h_parser.add_argument('--fold-change', type=float, default=0., help='Provide a log2(fold-change) cutoff for DSA results (default 0.)')
+    h_parser.add_argument('--aggregate', action='store_true', default=False, help='show results at group level (one entry per group)')
+    h_parser.add_argument('--out-dir', type=str, default='./out', help='Specify the output directory')
     h_parser.add_argument('--prefix', type=str, default='', help='Add prefix to the output file')
     h_parser.add_argument('--method', type=str, default='average',
                         help="Linkage method to use for calculating clusters. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'average')")
@@ -53,12 +53,12 @@ def get_arguments():
     s_parser.add_argument('--meta-file', type=str, help='A TAB separated file that contains the sample name and conditions')
     s_parser.add_argument('--coordinate', type=str, help='coordinate: e.g. chr1:123456-234567')
     s_parser.add_argument('--gtf', type=str, help='A GTF file')
-    s_parser.add_argument('--shrink', action='store_true', default=False, help='shrink region.')
-    s_parser.add_argument("--min-coverage", type=int, default=1, help='minimum coverage to ignore')
+    s_parser.add_argument('--shrink', action='store_true', default=False, help='shrink long introns and exons')
+    s_parser.add_argument("--min-coverage", type=int, default=3, help='minimum coverage to ignore')
     s_parser.add_argument("--group-id", type=str, help='specify the group id')
-    s_parser.add_argument("--strand", default="NONE", type=str,
-        help="Strand specificity: <NONE> <SENSE> <ANTISENSE> <MATE1_SENSE> <MATE2_SENSE> [default=%(default)s]")
-    s_parser.add_argument('--out-dir', type=str, default='./out', help='The output directory')
+    # s_parser.add_argument("--strand", default="NONE", type=str,
+    #     help="Strand specificity: <NONE> <SENSE> <ANTISENSE> <MATE1_SENSE> <MATE2_SENSE> [default=%(default)s]")
+    s_parser.add_argument('--out-dir', type=str, default='./out', help='Specify the output directory')
     s_parser.add_argument('--prefix', type=str, default='', help='Add prefix to the output file')
 
     if len(sys.argv) < 2:
@@ -104,8 +104,7 @@ def run_heatmap_module(args, parser_dict):
 
 def run_sashimi_module(args, parser_dict):
     if args.bam_list and args.coordinate:
-        sashimi_plot_with_bams(args.bam_list, args.coordinate, args.gtf, Path(args.out_dir), args.prefix, args.shrink,
-                           args.strand, args.min_coverage)
+        sashimi_plot_with_bams(args.bam_list, args.coordinate, args.gtf, Path(args.out_dir), args.prefix, args.shrink, 'NONE', args.min_coverage)
     elif args.tsv_file and args.meta_file and args.gtf:
         sashimi_polt_without_bams(args.tsv_file, args.meta_file, args.gtf, args.group_id,
                                   Path(args.out_dir), args.prefix, args.shrink, args.min_coverage)
