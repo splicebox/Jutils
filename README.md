@@ -53,7 +53,7 @@ python3 jutils.py convert-results [ --mntjulip-dir | --leafcutter-dir | --majiq-
         options:
         --out-dir      specify the output directory
 ```
-The command takes as input the directory containing the output from the specified DS tool, and generates a TSV file in the ./out directory, user can output directory by option `--out-dir`
+The command takes as input the directory containing the output from the specified DS tool, and generates a TSV file in the ./out directory, user can output directory by option `--out-dir`. Sample TSV files are in [data/results.tsv.zip](https://github.com/splicebox/Jutils/blob/master/data/results.tsv.zip)
 
 _Heatmap visualization_
 ```
