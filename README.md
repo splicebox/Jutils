@@ -83,14 +83,14 @@ _Sashimi visualization_
 ```
 python3 jutils.py sashimi --tsv-file <tsv_file> --meta-file <meta_file> --gtf <gtf_file> [ --group-id <group_id> | --coordinate <coords> ] [options]
         where:
-        --group_id     select group to visualize
-        --coordinate   select genomic range for visualization
-        --gtf          GTF file of gene annotations to extract exons not in the TSV file
+        --group_id      select group to visualize
+        --coordinate    select genomic range for visualization
+        --gtf           GTF file of gene annotations to extract exons not in the TSV file
         options:
         --shrink        shrink long introns and exons
         --min-coverage  minimum coverage to ignore
-        --prefix       add prefix to the output file
-        --out-dir      specify the output directory
+        --prefix        add prefix to the output file
+        --out-dir       specify the output directory
 ```
 The streamlined command above will use solely information contained in the TSV and metadata files for visualization. Introns will be displayed with the values (e.g., read counts, PSI value) in multiple samples, separately by the conditions specified in the metadata file. Flanking introns will be shown with coverage level >=3 read counts (the coverage level can be tuned by `--min-coverage` option). The plotted region can also be shrinked by option `--shrink`, if the concensus introns or exons are too long.
 
