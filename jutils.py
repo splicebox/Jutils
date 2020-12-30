@@ -31,7 +31,7 @@ def get_arguments():
 
     h_parser = subparser.add_parser('heatmap', help='')
     parser_dict['heatmap'] = h_parser
-    h_parser.add_argument('--tsv-file', type=str, help='the TSV file that contains the extracted results')
+    h_parser.add_argument('--tsv-file', type=str, help='a TSV file that contains the extracted results')
     h_parser.add_argument('--meta-file', type=str, help='a TAB separated file that contains the sample name and conditions')
     h_parser.add_argument('--p-value', type=float, default=0.05, help='provide a p-value cutoff (default 0.05)')
     h_parser.add_argument('--q-value', type=float, default=1.0, help='provide a q-value cutoff (default 1.0)')
@@ -43,13 +43,13 @@ def get_arguments():
     h_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
     h_parser.add_argument('--method', type=str, default='average',
                         help="linkage method to use for calculating clusters. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'average')")
-    h_parser.add_argument('--metric', type=str, default='braycurtis',
+    h_parser.add_argument('--metric', type=str, default='braycurtis',f
                         help="the distance metric to use. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'braycurtis')")
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
     s_parser.add_argument('--bam-list', type=str, help='a BAM files list')
-    s_parser.add_argument('--tsv-file', type=str, help='the TSV file that contains the extracted results')
+    s_parser.add_argument('--tsv-file', type=str, help='a TSV file that contains the extracted results')
     s_parser.add_argument('--meta-file', type=str, help='a TAB separated file that contains the sample name and conditions')
     s_parser.add_argument('--coordinate', type=str, help='select genomic range for visualization: e.g. chr1:123456-234567')
     s_parser.add_argument('--gtf', type=str, help='a GTF file with gene annotations')
