@@ -42,9 +42,9 @@ def get_arguments():
     h_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     h_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
     h_parser.add_argument('--method', type=str, default='average',
-                        help="clustering method. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'average')")
+                        help="clustering method, choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'average')")
     h_parser.add_argument('--metric', type=str, default='braycurtis',
-                        help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'braycurtis')")
+                        help="distance metric for clustering, choose from 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'braycurtis')")
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
@@ -135,4 +135,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
