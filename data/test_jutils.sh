@@ -1,5 +1,5 @@
 
-git clone https://github.com/Guangyu-Yang/Jutils.git
+git clone https://github.com/splicebox/Jutils.git
 cd Jutils
 
 base_dir="data"
