@@ -39,10 +39,11 @@ python3 jutils.py venn-diagram --tsv-file-list "${result_dir}/tsv_file_list.txt"
 
 # Sashimi Plot
 # MntJULiP: (used g006855 for jutils paper)
+wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M17/gencode.vM17.annotation.gtf.gz
 python3 jutils.py sashimi --tsv-file "${result_dir}/mntjulip_DSR_results.tsv" \
                           --meta-file "${base_dir}/mntjulip_meta_file.tsv" \
                           --out-dir "${out_dir}" \
                           --group-id "g006855" \
-                          --gtf "gencode.vM17.annotation.gtf" \
+                          --gtf "gencode.vM17.annotation.gtf.gz" \
                           --shrink
 
