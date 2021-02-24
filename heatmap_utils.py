@@ -42,11 +42,15 @@ def process_group(x):
         _chr, coord = label.split(':')
         _start, _end = (int(v) for v in coord.split('-'))
         start, end = min(start, _start), max(end, _end)
-    return f"{x['GeneName'].iloc[0]}_{_chr}:{start}-{end}"
+        gene_name = x['GeneName'].iloc[0].split(',')[0]
+    return f"{gene_name}_{_chr}:{start}-{end}"
 
 
 def process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top_num):
     print('Unsupervised mode, the option --q-value, --p-value, --dpsi, --fold-change will be ignored')
+    if np.any(data_df['GeneName'] != '.'):
+        data_df = data_df[data_df['GeneName'] != '.']
+
     if 'dPSI' in original_columns:
         if data_df.shape[1] > 14 and aggregate:
             print("Multi-way comparison doesn't support aggregate mode, aggregate mode disabled!")
@@ -97,7 +101,8 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
                             foldchange_threshold, avg_threshold, aggregate):
     data_df = data_df[data_df['p-value'] < p_value_threhold]
     data_df = data_df[data_df['q-value'] < q_value_threhold]
-    # data_df = data_df[data_df['GeneName'] != '.']
+    if np.any(data_df['GeneName'] != '.'):
+        data_df = data_df[data_df['GeneName'] != '.']
 
     if 'dPSI' in original_columns:
         if data_df.shape[1] > 14 and aggregate:
