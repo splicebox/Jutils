@@ -1,4 +1,3 @@
-
 git clone https://github.com/splicebox/Jutils.git
 cd Jutils
 
@@ -30,20 +29,57 @@ python3 jutils.py heatmap --tsv-file "${result_dir}/mntjulip_DSA_results.tsv" \
                           --out-dir "${out_dir}" \
                           --p-value 0.05 --q-value 1 --avg 50 --fold-change 2 --prefix mntjulip_DSA
 
+# Heatmap
+# DSR with aggregate, unsupervised
+python3 jutils.py heatmap --tsv-file "${result_dir}/mntjulip_DSR_results.tsv" \
+                          --meta-file "${base_dir}/mntjulip_meta_file.tsv" \
+                          --out-dir "${out_dir}" \
+                          --aggregate --prefix mntjulip_DSR \
+                          --unsupervised\
+                          --metric "cityblock" --method "average"
+
+# DSR without aggregate, unsupervised
+python3 jutils.py heatmap --tsv-file "${result_dir}/mntjulip_DSR_results.tsv" \
+                          --meta-file "${base_dir}/mntjulip_meta_file.tsv" \
+                          --out-dir "${out_dir}" \
+                          --unsupervised \
+                          --prefix mntjulip_DSR
+
+# DSA, unsupervised
+python3 jutils.py heatmap --tsv-file "${result_dir}/mntjulip_DSA_results.tsv" \
+                          --meta-file "${base_dir}/mntjulip_meta_file.tsv" \
+                          --out-dir "${out_dir}" \
+                          --unsupervised \
+                          --prefix mntjulip_DSA
 
 # Venn Diagram
-/bin/ls ${result_dir}/*_results.tsv > ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/mntjulip_DSR_results.tsv" > ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/leafcutter_results.tsv" >> ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/majiq_results.tsv" >> ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv" >> ${result_dir}/tsv_file_list.txt
+
 python3 jutils.py venn-diagram --tsv-file-list "${result_dir}/tsv_file_list.txt" \
                                --out-dir "${out_dir}" \
                                --p-value 0.05 --q-value 1 --dpsi 0.05
 
+# custom option for each tools
+rm -rf ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/leafcutter_results.tsv\tLeafCutter\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/majiq_results.tsv\tMAJIQ\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${result_dir}/tsv_file_list.txt
+echo "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv\trMATs\t--p-value 0.05 --q-value 1 --dpsi 0.05" >> ${result_dir}/tsv_file_list.txt
+
+python3 jutils.py venn-diagram --tsv-file-list "${result_dir}/tsv_file_list.txt" \
+                               --out-dir "${out_dir}"
+
+
 # Sashimi Plot
 # MntJULiP: (used g006855 for jutils paper)
 wget ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M17/gencode.vM17.annotation.gtf.gz
+gunzip gencode.vM17.annotation.gtf.gz
 python3 jutils.py sashimi --tsv-file "${result_dir}/mntjulip_DSR_results.tsv" \
                           --meta-file "${base_dir}/mntjulip_meta_file.tsv" \
                           --out-dir "${out_dir}" \
                           --group-id "g006855" \
-                          --gtf "gencode.vM17.annotation.gtf.gz" \
+                          --gtf "gencode.vM17.annotation.gtf" \
                           --shrink
-
