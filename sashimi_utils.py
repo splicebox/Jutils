@@ -1,5 +1,5 @@
 import subprocess as sp
-import sys, re, copy, os, codecs
+import sys, re, copy, os, codecs, gzip
 from collections import OrderedDict
 
 
@@ -65,8 +65,8 @@ def sashimi_polt_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
 
                 bam_dict[strand][id_list[i]][2].append(_start)
                 bam_dict[strand][id_list[i]][3].append(_end)
-                bam_dict[strand][id_list[i]][4].append( y[ _start - start - 1 ])
-                bam_dict[strand][id_list[i]][5].append( y[ _end - start + 1 ])
+                bam_dict[strand][id_list[i]][4].append( y[_start - start - 1])
+                bam_dict[strand][id_list[i]][5].append( y[_end - start + 1])
                 bam_dict[strand][id_list[i]][6].append(count)
 
     palette = get_preset_palette()
@@ -103,7 +103,7 @@ def get_depths_from_gtf(file, coord, strand):
     x = [i for i in range(start, end)]
     y = [0] * (end - start)
     end = end - 1
-    with open(file) as f:
+    with open(file, 'r') as f:
         for line in f:
             if line.startswith("#"):
                 continue
@@ -118,6 +118,7 @@ def get_depths_from_gtf(file, coord, strand):
                     _start, _end = max(_start, start), min(end, _end)
                     y[_start-start: _end-start] = [1] * (_end-_start)
     return x, y
+
 
 def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, strand="NONE", min_coverage=1):
     palette = get_preset_palette()
@@ -421,8 +422,6 @@ def read_gtf(file, c):
                     exons.setdefault(transcript_id, []).append((max(el_start, start), min(end, el_end), strand))
 
     return transcripts, exons
-
-
 
 def make_introns(transcripts, exons, intersected_introns=None):
     new_transcripts = copy.deepcopy(transcripts)
