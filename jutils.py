@@ -39,12 +39,14 @@ def get_arguments():
     h_parser.add_argument('--avg', type=float, default=0., help='cutoff for estimated read counts of DSA results (default 0.)')
     h_parser.add_argument('--fold-change', type=float, default=0., help='cutoff for log2(fold-change) of DSA results (default 0.)')
     h_parser.add_argument('--aggregate', action='store_true', default=False, help='show results at group level (one entry per group)')
+    h_parser.add_argument('--unsupervised', action='store_true', default=False, help='show results in an unsupervised way')
     h_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     h_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
+    h_parser.add_argument('--top', type=str, default=300, help='specify the number of top events to show in heatmap (default 300)')
     h_parser.add_argument('--method', type=str, default='average',
-                        help="clustering method, choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'average')")
+                        help="clustering method. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'average')")
     h_parser.add_argument('--metric', type=str, default='braycurtis',
-                        help="distance metric for clustering, choose from 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'braycurtis')")
+                        help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'braycurtis')")
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
@@ -60,6 +62,7 @@ def get_arguments():
     #     help="Strand specificity: <NONE> <SENSE> <ANTISENSE> <MATE1_SENSE> <MATE2_SENSE> [default=%(default)s]")
     s_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     s_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
+
 
     if len(sys.argv) < 2:
         parser.print_help(sys.stderr)
@@ -98,8 +101,8 @@ def run_heatmap_module(args, parser_dict):
         parser_dict['heatmap'].print_help(sys.stderr)
     else:
         plot_heatmap(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
-                 args.q_value, args.dpsi, args.fold_change, args.avg, args.aggregate,
-                 args.method, args.metric, args.prefix)
+                 args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
+                 args.aggregate, args.method, args.metric, args.prefix, args.top)
 
 
 def run_sashimi_module(args, parser_dict):
@@ -135,3 +138,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
