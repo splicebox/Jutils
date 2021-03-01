@@ -2,7 +2,6 @@ import subprocess as sp
 import sys, re, copy, os, codecs, gzip
 from collections import OrderedDict
 
-
 def sashimi_polt_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefix, shrink, min_coverage):
     with open(tsv_file, 'r') as f:
         lines = f.readlines()
@@ -103,20 +102,26 @@ def get_depths_from_gtf(file, coord, strand):
     x = [i for i in range(start, end)]
     y = [0] * (end - start)
     end = end - 1
-    with open(file, 'r') as f:
-        for line in f:
-            if line.startswith("#"):
-                continue
-            _chr, _, type, _start, _end, _, _strand, _, tags = line.strip().split("\t")
-            if _chr != chr:
-                continue
-            _start, _end = int(_start) - 1, int(_end)
-            if strand and strand != _strand:
-                continue
-            if type == "exon":
-                if (start < _start < end or start < _end < end):
-                    _start, _end = max(_start, start), min(end, _end)
-                    y[_start-start: _end-start] = [1] * (_end-_start)
+    f = gzip.open(file, 'rb') if file.endswith('.gz') else open(file, 'r')
+    for line in f:
+        try:
+            line = line.decode("utf-8")
+        except AttributeError:
+            pass
+
+        if line.startswith("#"):
+            continue
+        _chr, _, type, _start, _end, _, _strand, _, tags = line.strip().split("\t")
+        if _chr != chr:
+            continue
+        _start, _end = int(_start) - 1, int(_end)
+        if strand and strand != _strand:
+            continue
+        if type == "exon":
+            if (start < _start < end or start < _end < end):
+                _start, _end = max(_start, start), min(end, _end)
+                y[_start-start: _end-start] = [1] * (_end-_start)
+    f.close()
     return x, y
 
 
@@ -402,25 +407,30 @@ def read_gtf(file, c):
     transcripts = OrderedDict()
     chr, start, end = parse_coordinates(c)
     end = end - 1
-    with open(file) as f:
-        for line in f:
-            if line.startswith("#"):
-                continue
-            el_chr, _, el, el_start, el_end, _, strand, _, tags = line.strip().split("\t")
-            if el_chr != chr:
-                continue
-            d = dict(kv.strip().split(" ") for kv in tags.strip(";").split("; "))
-            transcript_id = d["transcript_id"]
-            el_start, el_end = int(el_start) - 1, int(el_end)
-            strand = '"' + strand + '"'
-            if el == "transcript":
-                if (el_end > start and el_start < end):
-                    transcripts[transcript_id] = max(start, el_start), min(end, el_end), strand
-                continue
-            if el == "exon":
-                if (start < el_start < end or start < el_end < end):
-                    exons.setdefault(transcript_id, []).append((max(el_start, start), min(end, el_end), strand))
+    f = gzip.open(file, 'rb') if file.endswith('.gz') else open(file, 'r')
+    for line in f:
+        try:
+            line = line.decode("utf-8")
+        except AttributeError:
+            pass
 
+        if line.startswith("#"):
+            continue
+        el_chr, _, el, el_start, el_end, _, strand, _, tags = line.strip().split("\t")
+        if el_chr != chr:
+            continue
+        d = dict(kv.strip().split(" ") for kv in tags.strip(";").split("; "))
+        transcript_id = d["transcript_id"]
+        el_start, el_end = int(el_start) - 1, int(el_end)
+        strand = '"' + strand + '"'
+        if el == "transcript":
+            if (el_end > start and el_start < end):
+                transcripts[transcript_id] = max(start, el_start), min(end, el_end), strand
+            continue
+        if el == "exon":
+            if (start < el_start < end or start < el_end < end):
+                exons.setdefault(transcript_id, []).append((max(el_start, start), min(end, el_end), strand))
+    f.close()
     return transcripts, exons
 
 def make_introns(transcripts, exons, intersected_introns=None):
