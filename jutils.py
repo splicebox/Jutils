@@ -42,10 +42,10 @@ def get_arguments():
     h_parser.add_argument('--unsupervised', action='store_true', default=False, help='show results in an unsupervised way')
     h_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     h_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
-    h_parser.add_argument('--top', type=str, default=300, help='specify the number of top events to show in heatmap (default 300)')
-    h_parser.add_argument('--method', type=str, default='average',
-                        help="clustering method. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'average')")
-    h_parser.add_argument('--metric', type=str, default='braycurtis',
+    h_parser.add_argument('--top', type=int, default=100, help='specify the number of top events to show in heatmap (default 300)')
+    h_parser.add_argument('--method', type=str, default='weighted',
+                        help="clustering method. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'weighted')")
+    h_parser.add_argument('--metric', type=str, default='cityblock',
                         help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'braycurtis')")
 
     s_parser = subparser.add_parser('sashimi', help='')
