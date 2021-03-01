@@ -20,6 +20,7 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threhold, q_value_threhold,
             sample_cond_dict[sample] = cond
 
     data_df = pd.read_csv(file, sep='\t', comment='#')
+    data_df['GeneName'] = data_df['GeneName'].apply(truncate_gene_name)
     original_columns = data_df.columns
     if np.all(data_df['ReadCount1'] == '.') and np.all(data_df['PSI'] == '.'):
         raise Exception("Column 'ReadCount1' and 'PSI' don't contain values! This could happen if the TSV file is generated from MAJIQ outputs.")
@@ -36,20 +37,30 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threhold, q_value_threhold,
                       method, metric, prefix, aggregate, unsupervised, out_dir)
 
 
+def truncate_gene_name(string):
+    gene_names = string.split(',')
+    if len(gene_names) > 3:
+        return ','.join(gene_names[:3])
+    return string
+
+
 def process_group(x):
     start, end = float('inf'), 0
     for label in x['FeatureLabel']:
         _chr, coord = label.split(':')
         _start, _end = (int(v) for v in coord.split('-'))
         start, end = min(start, _start), max(end, _end)
-        gene_name = x['GeneName'].iloc[0].split(',')[0]
-    return f"{gene_name}_{_chr}:{start}-{end}"
+    return f"{x['GeneName'].iloc[0]}_{_chr}:{start}-{end}"
 
 
 def process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top_num):
     print('Unsupervised mode, the option --q-value, --p-value, --dpsi, --fold-change will be ignored')
     if np.any(data_df['GeneName'] != '.'):
         data_df = data_df[data_df['GeneName'] != '.']
+
+    # counts_df = data_df['ReadCount1'].str.split(',', expand=True).astype(float)
+    # bools = counts_df.apply(lambda x: x.mean() > 5, axis=1)
+    # data_df = data_df[bools]
 
     if 'dPSI' in original_columns:
         if data_df.shape[1] > 14 and aggregate:
@@ -68,12 +79,18 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
             data_df4 = data_df4[data_df4['dPSI'] * data_df4['Bool'] > 0]
 
             groups = data_df4.groupby(['GroupID'])
-            data_df = groups.apply(lambda x: np.sum(x[samples], axis=0))
-            data_df.index = groups.apply(process_group)
+            data_df5 = groups.apply(lambda x: np.sum(x[samples], axis=0))
+            data_df5.index = groups.apply(process_group)
+            # data_df5['variance'] = data_df5.mean(axis=1) / data_df5.var(axis=1)
+            data_df5['variance'] = data_df5.sub(data_df5.mean(axis=1), axis=0).abs().mean(axis=1)
+            data_df5 = data_df5.sort_values(by=['variance'], ascending=False)
+            data_df = data_df5.drop(columns=['variance'])
         else:
             data_df2 = data_df['PSI'].str.split(',', expand=True).astype(float)
             data_df2.columns = samples
-            data_df2['variance'] = data_df2.mean(axis=1) / data_df2.var(axis=1)
+
+            # data_df2['variance'] = data_df2.mean(axis=1) / data_df2.var(axis=1)
+            data_df2['variance'] = data_df2.sub(data_df2.mean(axis=1), axis=0).abs().mean(axis=1)
             data_df2['index'] = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
 
             groups = data_df2.groupby(['index'])
@@ -85,7 +102,9 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
         data_df2 = data_df['ReadCount1'].str.split(',', expand=True).astype(float)
         data_df2.columns = samples
-        data_df2['variance'] = data_df2.mean(axis=1) / data_df2.var(axis=1)
+        data_df2['variance'] = data_df2.var(axis=1) / data_df2.mean(axis=1)
+        data_df2 = data_df2.apply(lambda x: np.log2(x + 1e-2))
+        # data_df2['variance'] = data_df2.mean(axis=1) / data_df2.var(axis=1)
         data_df2.index = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
         data_df = data_df2
         data_df = data_df.sort_values(by=['variance'], ascending=False)
@@ -146,7 +165,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
         data_df2 = data_df['ReadCount1'].str.split(',', expand=True).astype(float)
         data_df2.columns = samples
         data_df2.index = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
-        data_df = data_df2
+        data_df = data_df2.apply(lambda x: np.log2(x + 1e-2))
     return data_df
 
 
@@ -177,13 +196,15 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     if aggregate:
         strings.append('aggregated')
 
+    legend_title = 'PSI' if 'dPSI' in original_columns else 'log2(exp)'
+
     figure = sns.clustermap(data_df, cmap="RdBu_r", col_cluster=False, z_score=0, vmin=-5, vmax=5,
                             metric=metric, method=method, mask=mask,
                             yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight), **clustermapParams)
 
     figure.ax_heatmap.set_facecolor("lightyellow")
     set_xtick_text_colors(figure, sample_cond_dict, conditions)
-
+    figure.ax_cbar.set_title(f'{legend_title}_Z', fontsize=16)
     figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap_Z.png'])))
     plt.close()
 
@@ -193,6 +214,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
 
     figure.ax_heatmap.set_facecolor("lightyellow")
     set_xtick_text_colors(figure, sample_cond_dict, conditions)
+    figure.ax_cbar.set_title(f'{legend_title}_Z', fontsize=16)
     figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap2_Z.png'])))
     plt.close()
 
@@ -203,6 +225,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
 
         figure.ax_heatmap.set_facecolor("lightyellow")
         set_xtick_text_colors(figure, sample_cond_dict, conditions)
+        figure.ax_cbar.set_title(legend_title, fontsize=16)
         figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap.png'])))
         plt.close()
 
@@ -212,20 +235,21 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
 
         figure.ax_heatmap.set_facecolor("lightyellow")
         set_xtick_text_colors(figure, sample_cond_dict, conditions)
+        figure.ax_cbar.set_title(legend_title, fontsize=16)
         figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap2.png'])))
         plt.close()
 
 
 def get_preset_palette():
     # palette = "#ff0000", "#00ff00", "#0000ff", "#000000"
-    palette = '#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#000000'
+    palette = ['#e6194B', '#000075', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#3cb44b', '#a9a9a9', '#000000']
     return palette
 
 
 def set_xtick_text_colors(figure, sample_cond_dict, conditions):
     palette = get_preset_palette()
     n = len(palette)
-    cond_color_dict = {cond: palette[i % n] for i, cond in enumerate(conditions)}
+    cond_color_dict = {cond: palette[i % n] for i, cond in enumerate(set(conditions))}
     for tick_label in figure.ax_heatmap.axes.get_xticklabels():
         cond = sample_cond_dict[tick_label.get_text()]
         tick_label.set_color(cond_color_dict[cond])
