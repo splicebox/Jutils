@@ -86,5 +86,5 @@ python3 jutils.py sashimi --tsv-file "${result_dir}/mntjulip_DSR_results.tsv" \
                           --meta-file "${base_dir}/mntjulip_meta_file.tsv" \
                           --out-dir "${out_dir}" \
                           --group-id "g006855" \
-                          --gtf "{base_dir}/gencode.vM17.annotation.clean.gtf" \
+                          --gtf "{base_dir}/gencode.vM17.annotation.clean.gtf.gz" \
                           --shrink
