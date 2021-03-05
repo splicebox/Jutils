@@ -4,7 +4,7 @@ import sys, argparse, textwrap
 from convert_results_utils import convert_leafcutter_results, convert_rmats_results, convert_mntjulip_results, convert_majiq_results
 from venn_diagram_utils import plot_venn_diagram
 from heatmap_utils import plot_heatmap
-from sashimi_utils import sashimi_plot_with_bams, sashimi_polt_without_bams
+from sashimi_utils import sashimi_plot_with_bams, sashimi_plot_without_bams
 
 
 def get_arguments():
