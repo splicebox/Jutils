@@ -24,6 +24,8 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
                 coord = [chr, start, end]
     if not coord:
         raise Exception(f"Can't find the coordinate with the provided group ID {group_id}!")
+        sys.exits(-1)
+
     strand = strand if strand and strand != '.' else None
 
     coord[1], coord[2] = coord[1] - 100, coord[2] + 100
@@ -128,10 +130,13 @@ def get_depths_from_gtf(file, coord, strand):
 
 def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, strand="NONE", min_coverage=1,
                            group_id=None, tsv_file=None):
-
     if group_id:
         if not tsv_file:
             raise Exception('Please specify a tsv file (--tsv-file) with the group-id option')
+            sys.exits(-1)
+
+        with open(tsv_file, 'r') as f:
+            lines = f.readlines()
 
         coord, strand = None, None
         for line in lines:
@@ -149,9 +154,11 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
                 else:
                     coord = [chr, start, end]
         if not coord:
-            raise Exception(f"Can't find the coordinate with the provided group ID {group_id}!")
+            raise Exception(f"Can't find the coordinate with the provided group ID {group_id} in {tsv_file}!")
+            sys.exits(-1)
+
         strand = strand if strand and strand != '.' else None
-        coordinate = f'{chr}:{coord[1] - 100}-{coord[2] + 100}'
+        coordinate = f'{chr}:{coord[1]-100}-{coord[2]+100}'
 
     palette = get_preset_palette()
 
