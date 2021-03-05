@@ -108,7 +108,8 @@ def run_heatmap_module(args, parser_dict):
 def run_sashimi_module(args, parser_dict):
     if args.bam_list and args.coordinate:
         sashimi_plot_with_bams(args.bam_list, args.coordinate, args.gtf, Path(args.out_dir),
-                               args.prefix, args.shrink, 'NONE', args.min_coverage)
+                               args.prefix, args.shrink, 'NONE', args.min_coverage,
+                               args.group_id, args.tsv_file)
     elif args.tsv_file and args.meta_file and args.gtf:
         sashimi_plot_without_bams(args.tsv_file, args.meta_file, args.gtf, args.group_id,
                                   Path(args.out_dir), args.prefix, args.shrink, args.min_coverage)
