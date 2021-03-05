@@ -126,7 +126,33 @@ def get_depths_from_gtf(file, coord, strand):
     return x, y
 
 
-def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, strand="NONE", min_coverage=1):
+def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, strand="NONE", min_coverage=1,
+                           group_id=None, tsv_file=None):
+
+    if group_id:
+        if not tsv_file:
+            raise Exception('Please specify a tsv file (--tsv-file) with the group-id option')
+
+        coord, strand = None, None
+        for line in lines:
+            if line.startswith('#') or line.startswith('GeneName'):
+                continue
+            # GeneName, GroupID, FeatureElement, FeatureType, FeatureLabel, strand, p-value, q-value, dPSI,
+            # ReadCount1, ReadCount2, PSI
+            items = line.strip().split('\t')
+            _gene_name, _group_id, label, _strand = items[0], items[1], items[4], items[5]
+            if _group_id == group_id:
+                strand = _strand
+                chr, start, end = parse_coordinates(label)
+                if coord:
+                    coord[1], coord[2] = min(start, coord[1]), max(end, coord[2])
+                else:
+                    coord = [chr, start, end]
+        if not coord:
+            raise Exception(f"Can't find the coordinate with the provided group ID {group_id}!")
+        strand = strand if strand and strand != '.' else None
+        coordinate = f'{chr}:{coord[1] - 100}-{coord[2] + 100}'
+
     palette = get_preset_palette()
 
     bam_dict, overlay_dict, color_dict,  = {"+": OrderedDict()}, OrderedDict(), OrderedDict()
