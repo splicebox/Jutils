@@ -130,9 +130,12 @@ def get_depths_from_gtf(file, coord, strand):
 
 def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, strand="NONE", min_coverage=1,
                            group_id=None, tsv_file=None):
+    if not group_id and not coordinate:
+        raise Exception('Please specify either a coordinate or a group-id!')
+        sys.exits(-1)
     if group_id:
         if not tsv_file:
-            raise Exception('Please specify a tsv file (--tsv-file) with the group-id option')
+            raise Exception('Please specify a tsv file (--tsv-file) with the group-id option!')
             sys.exits(-1)
 
         with open(tsv_file, 'r') as f:
