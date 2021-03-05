@@ -186,7 +186,7 @@ def convert_rmats_results(data_dir, out_dir):
             label = f'{_chr}:{fee},{les}-{lee}:{ses}-{see}'
             p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
             gene_name = gene_name[1:-1]
-            out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tA3SS\t{label}\t{strand}\t{p_value}\t{p_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
+            out_buffer += f'{gene_name}\tJ{i:06d}\t{fid}\tA3SS\t{label}\t{strand}\t{p_value}\t{p_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
             i += 1
 
         file = out_dir / f'rmats_{file_type}_results.tsv'
@@ -316,6 +316,7 @@ def convert_mntjulip_DSA_results(data_dir, out_dir):
     items = lines[0].strip().split('\t')
     indices = [i for i in range(len(items)) if items[i].startswith('avg')]
     conds = [items[i] for i in indices]
+    i = 1
     for line in lines[1:]:
         # chrom start end strand gene_name status  llr     p_value q_value avg_read_counts(case)   avg_read_counts(control)
         items = line.strip().split('\t')
@@ -324,8 +325,9 @@ def convert_mntjulip_DSA_results(data_dir, out_dir):
             p_value, q_value = items[7: 9]
             intron = f'{_chr}:{start}-{end}'
             fold_change = max_fold_change(items, indices)
-            intron_info_dict[(intron, strand)] = f'{gene_names_str}\t.\t.\tintron\t{intron}\t{strand}\t{p_value}\t{q_value}\t{fold_change:.6g}\t'
+            intron_info_dict[(intron, strand)] = f'{gene_names_str}\tJ{i:06d}\tJ{i:06d}\tintron\t{intron}\t{strand}\t{p_value}\t{q_value}\t{fold_change:.6g}\t'
             intron_means_dict[(intron, strand)] = [items[i] for i in indices]
+            i += 1
     file = data_dir / 'intron_data.txt'
     with open(file, 'r') as f:
         lines = f.readlines()
