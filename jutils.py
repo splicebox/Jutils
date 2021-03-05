@@ -106,7 +106,7 @@ def run_heatmap_module(args, parser_dict):
 
 
 def run_sashimi_module(args, parser_dict):
-    if args.bam_list and args.coordinate:
+    if args.bam_list:
         sashimi_plot_with_bams(args.bam_list, args.coordinate, args.gtf, Path(args.out_dir),
                                args.prefix, args.shrink, 'NONE', args.min_coverage,
                                args.group_id, args.tsv_file)
