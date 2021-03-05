@@ -62,15 +62,15 @@ _Heatmap visualization_
 ```
 python3 jutils.py heatmap --tsv-file <tsv_file> --meta-file <meta_file> [options]
         options:
-        --dpsi         cutoff for delta PSI (Percent Splice In)
-        --p-value      cutoff for differential test p-value
-        --q-value      cutoff for differential test q-value
+        --dpsi         cutoff for delta PSI (Percent Splice In) (default 0.05)
+        --p-value      cutoff for differential test p-value (default 0.05)
+        --q-value      cutoff for differential test q-value (default 1.0)
         --aggregate    show results at group level (one entry per group)
-        --avg          cutoff for estimated read counts of DSA results
-        --fold-change  cutoff for log2(fold-change) of DSA results
+        --avg          cutoff for estimated read counts of DSA results (default 0.0)
+        --fold-change  cutoff for log2(fold-change) of DSA results (default 0.0)
         --unsupervised display the top most variable features
         --top          number of top most variable features to display 
-        --method       clustering method
+           --method       clustering method (default 300)
         --metric       distance metric for clustering
         --prefix       add prefix to the output file name
         --out-dir      specify the output directory
@@ -120,9 +120,9 @@ _Venn diagram visualization_
 ```
 python3 jutils.py venn-diagram --tsv-file-list <tsv_file_list> [options]
         options:
-        --dpsi         cutoff for delta PSI (Percent Splice In)
-        --p-value      cutoff for differential test p-value
-        --q-value      cutoff for differential test q-value
+        --dpsi         cutoff for delta PSI (Percent Splice In) (default 0.0)
+        --p-value      cutoff for differential test p-value (default 1.0)
+        --q-value      cutoff for differential test q-value (default 1.0)
         --prefix        add prefix to the output file name
         --out-dir       specify the output directory
 ```
