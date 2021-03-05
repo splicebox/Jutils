@@ -5,9 +5,9 @@ import argparse
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--p-value', type=float, default=0.05)
+    parser.add_argument('--p-value', type=float, default=1.0)
     parser.add_argument('--q-value', type=float, default=1.0)
-    parser.add_argument('--dpsi', type=float, default=0.05)
+    parser.add_argument('--dpsi', type=float, default=0.0)
     return parser
 
 
@@ -40,7 +40,9 @@ def plot_venn_diagram(list_file, out_dir, p_value_threhold, q_value_threhold, dp
         l_p_value_threhold, l_q_value_threhold, l_dpsi_threshold = p_value_threhold, q_value_threhold, dpsi_threshold
         if options and options[i]:
             arg = parser.parse_args(options[i][1:-1].split())
-            l_p_value_threhold, l_q_value_threhold, l_dpsi_threshold = arg.p_value, arg.q_value, arg.dpsi
+            l_p_value_threhold = min(arg.p_value, p_value_threhold)
+            l_q_value_threhold = min(arg.q_value, q_value_threhold)
+            l_dpsi_threshold = max(arg.dpsi, dpsi_threshold)
         genes = set()
         with open(file) as f:
             lines = f.readlines()
