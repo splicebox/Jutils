@@ -126,7 +126,7 @@ python3 jutils.py venn-diagram --tsv-file-list <tsv_file_list> [options]
         --prefix        add prefix to the output file name
         --out-dir       specify the output directory
 ```
-The command above creates Venn diagram representations of gene sets from multiple TSV files, corresponding to multiple tools or comparisons. User can filter the values by delta PSI, p-value, q-values with options `--dpsi`, `--p-value`, `--q-value`. Alternatively, the TSV file can include *additional* filters to apply to individual files. The format of the TSV file list is shown [below](#inputoutput). 
+The command above creates Venn diagram representations of gene sets from multiple TSV files, corresponding to multiple tools or comparisons. User can filter the values by delta PSI, p-value, q-values with options `--dpsi`, `--p-value`, `--q-value`. Additionally, the TSV file can include filters to apply to individual files. The format of the TSV file list is shown [below](#inputoutput). 
 
 #### Usage customized by program
 
