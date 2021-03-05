@@ -186,7 +186,7 @@ python3 jutils.py heatmap --tsv-file 'mntjulip_DSA_results.tsv' \
 
 _Multi-way comparison:_
 ```
-generate TSV file from MntJULiP output
+# generate TSV file from MntJULiP output
 result_dir='path/to/MntJULiP_results_dir'
 python3 jutils.py convert-results --mntjulip-dir ${result_dir}
 
