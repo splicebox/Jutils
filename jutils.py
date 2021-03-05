@@ -23,10 +23,10 @@ def get_arguments():
     v_parser = subparser.add_parser('venn-diagram', help='')
     parser_dict['venn-diagram'] = v_parser
     v_parser.add_argument('--tsv-file-list', type=str, help='a file that contains path of tsv files')
-    v_parser.add_argument('--p-value', type=float, default=0.05, help='cutoff for differential test p-value (default 0.05)')
+    v_parser.add_argument('--p-value', type=float, default=0.05, help='cutoff for differential test p-value (default 1.0)')
     v_parser.add_argument('--q-value', type=float, default=1.0, help='cutoff for differential test q-value (default 1.0)')
     v_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
-    v_parser.add_argument('--dpsi', type=float, default=0.05, help='cutoff for delta PSI (Percent Splice In) (default 0.05)')
+    v_parser.add_argument('--dpsi', type=float, default=0.05, help='cutoff for delta PSI (Percent Splice In) (default 0.0)')
     v_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
 
     h_parser = subparser.add_parser('heatmap', help='')
@@ -36,8 +36,8 @@ def get_arguments():
     h_parser.add_argument('--p-value', type=float, default=0.05, help='cutoff for differential test p-value (default 0.05)')
     h_parser.add_argument('--q-value', type=float, default=1.0, help='cutoff for differential test q-value (default 1.0)')
     h_parser.add_argument('--dpsi', type=float, default=0.05, help='cutoff for delta PSI (Percent Splice In) (default 0.05)')
-    h_parser.add_argument('--avg', type=float, default=0., help='cutoff for estimated read counts of DSA results (default 0.)')
-    h_parser.add_argument('--fold-change', type=float, default=0., help='cutoff for log2(fold-change) of DSA results (default 0.)')
+    h_parser.add_argument('--avg', type=float, default=0., help='cutoff for estimated read counts of DSA results (default 0.0)')
+    h_parser.add_argument('--fold-change', type=float, default=0., help='cutoff for log2(fold-change) of DSA results (default 0.0)')
     h_parser.add_argument('--aggregate', action='store_true', default=False, help='show results at group level (one entry per group)')
     h_parser.add_argument('--unsupervised', action='store_true', default=False, help='show results in an unsupervised way')
     h_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
@@ -138,4 +138,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
