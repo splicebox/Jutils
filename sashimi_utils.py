@@ -157,7 +157,8 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
             raise Exception(f"Can't find the coordinate with the provided group ID {group_id} in {tsv_file}!")
             sys.exits(-1)
 
-        strand = strand if strand and strand != '.' else None
+        strand_codes = {'+': "SENSE", '-': "ANTISENSE"}
+        strand = strand_codes[strand] if strand in '+-' else 'NONE'
         coordinate = f'{chr}:{coord[1]-100}-{coord[2]+100}'
 
     palette = get_preset_palette()
