@@ -2,7 +2,8 @@ import subprocess as sp
 import sys, re, copy, os, codecs, gzip
 from collections import OrderedDict
 
-def sashimi_polt_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefix, shrink, min_coverage):
+
+def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefix, shrink, min_coverage):
     with open(tsv_file, 'r') as f:
         lines = f.readlines()
 
