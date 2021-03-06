@@ -49,27 +49,50 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
     with open(tsv_file, 'r') as f:
         lines = f.readlines()
 
-    for line in lines:
-        if line.startswith('#') or line.startswith('GeneName'):
-            continue
-        #GeneName    GroupID FeatureElement  FeatureType FeatureLabel    strand  p-value q-value dPSI    ReadCount1  ReadCount2  PSI
-        items = line.strip().split('\t')
-        _gene_name, _group_id, label, _strand = items[0], items[1], items[4], items[5]
-        chr, _start, _end = parse_coordinates(label)
-        if _group_id == group_id:
-            read_counts = [int(v) for v in items[9].split(',')]
-            psis = [float(v) for v in items[11].split(',')]
-            chr, start, end = coord
-            for i, count in enumerate(read_counts):
-                # dons, accs, yd, ya, counts = [], [], [], [], []
-                if count < min_coverage:
-                    continue
+    if 'rmats' in lines[0]:
+        for line in lines:
+            if line.startswith('#') or line.startswith('GeneName'):
+                continue
 
-                bam_dict[strand][id_list[i]][2].append(_start)
-                bam_dict[strand][id_list[i]][3].append(_end)
-                bam_dict[strand][id_list[i]][4].append( y[_start - start - 1])
-                bam_dict[strand][id_list[i]][5].append( y[_end - start + 1])
-                bam_dict[strand][id_list[i]][6].append(count)
+            items = line.strip().split('\t')
+            _gene_name, _group_id, label, _strand = items[0], items[1], items[4], items[5]
+            chr, start, end = coord
+            if _group_id == group_id:
+                coordinates_list = parse_rmats_coordinates(label)
+                for coordinates, k in zip(coordinates_list, [9, 10]):
+                    read_counts = [int(v) for v in items[k].split(',')]
+                    for chr, _start, _end in coordinates:
+                        print(_start, end, _start-start-1, _end-start + 1, start, end)
+                        for i, count in enumerate(read_counts):
+                            if count < min_coverage:
+                                continue
+                            bam_dict[strand][id_list[i]][2].append(_start)
+                            bam_dict[strand][id_list[i]][3].append(_end)
+                            bam_dict[strand][id_list[i]][4].append( y[_start - start - 1])
+                            bam_dict[strand][id_list[i]][5].append( y[_end - start + 1])
+                            bam_dict[strand][id_list[i]][6].append(count)
+    else:
+        for line in lines:
+            if line.startswith('#') or line.startswith('GeneName'):
+                continue
+            #GeneName    GroupID FeatureElement  FeatureType FeatureLabel    strand  p-value q-value dPSI    ReadCount1  ReadCount2  PSI
+            items = line.strip().split('\t')
+            _gene_name, _group_id, label, _strand = items[0], items[1], items[4], items[5]
+            chr, _start, _end = parse_coordinates(label)
+            if _group_id == group_id:
+                read_counts = [int(v) for v in items[9].split(',')]
+                # psis = [float(v) for v in items[11].split(',')]
+                chr, start, end = coord
+                for i, count in enumerate(read_counts):
+                    # dons, accs, yd, ya, counts = [], [], [], [], []
+                    if count < min_coverage:
+                        continue
+
+                    bam_dict[strand][id_list[i]][2].append(_start)
+                    bam_dict[strand][id_list[i]][3].append(_end)
+                    bam_dict[strand][id_list[i]][4].append( y[_start - start - 1])
+                    bam_dict[strand][id_list[i]][5].append( y[_end - start + 1])
+                    bam_dict[strand][id_list[i]][6].append(count)
 
     palette = get_preset_palette()
 
@@ -98,6 +121,35 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
             r.write(R_script)
     else:
         plot(R_script)
+
+
+def parse_rmats_coordinates(label):
+    p1 = "\w*\d*:\d+,\d+-\d+,\d+"  # SE: '{_chr}:{uee},{es}-{ee},{des}'
+    p2 = "\w*\d*:\d+-\d+:\d+-\d+"  # IR: '{_chr}:{ues}-{uee}:{des}-{dee}'
+    p3 = "\w*\d*:\d+,\d+-\d+:\d+-\d+,\d+"  # MXE: '{_chr}:{uee},{es1}-{ee1}:{es2}-{ee2},{des}'
+    p4 = "\w*\d*:\d+-\d+:\d+-\d+,\d+"  # A5SS: '{_chr}:{les}-{lee}:{ses}-{see},{fes}'
+    p5 = "\w*\d*:\d+,\d+-\d+:\d+-\d+"  # A3SS: '{_chr}:{fee},{les}-{lee}:{ses}-{see}'
+
+    if re.match(p1, label):
+        chr, uee, es, ee, des = label.replace(',', ':').replace('-', ':').split(':')
+        uee, es, ee, des = int(uee), int(es), int(ee), int(des)
+        return [[(chr, uee, es), (chr, ee, des)], [(chr, uee, des)]]
+    elif re.match(p2, label):
+        chr, ues, uee, des, dee = label.replace(',', ':').replace('-', ':').split(':')
+        ues, uee, des, dee = int(ues), int(uee), int(des), int(dee)
+        return [[(chr, uee, des)], []]
+    elif re.match(p3, label):
+        chr, uee, es1, ee1, es2, ee2, des = label.replace(',', ':').replace('-', ':').split(':')
+        uee, es1, ee1, es2, ee2, des = int(uee), int(es1), int(ee1), int(es2), int(ee2), int(des)
+        return [[(chr, uee, es1), (chr, ee1, des)], [(chr, uee, es2), (chr, ee2, des)]]
+    elif re.match(p4, label):
+        chr, les, lee, ses, see, fes = label.replace(',', ':').replace('-', ':').split(':')
+        les, lee, ses, see, fes = int(les), int(lee), int(ses), int(see), int(fes)
+        return [[(chr, lee, fes)], [(chr, see, fes)]]
+    elif re.match(p5, label):
+        chr, fee, les, lee, ses, see = label.replace(',', ':').replace('-', ':').split(':')
+        fee, les, lee, ses, see = int(fee), int(les), int(lee), int(ses), int(see)
+        return [[(chr, fee, les)], [(chr, fee, ses)]]
 
 
 def get_depths_from_gtf(file, coord, strand):
@@ -133,10 +185,14 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
     if not group_id and not coordinate:
         raise Exception('Please specify either a coordinate or a group-id!')
         sys.exits(-1)
+
     if group_id:
         if not tsv_file:
             raise Exception('Please specify a tsv file (--tsv-file) with the group-id option!')
             sys.exits(-1)
+
+        if coordinate:
+            print('Warming: Jutils generates the Sashimi plot based on the provided group-id, the coordinate will be ignored!')
 
         with open(tsv_file, 'r') as f:
             lines = f.readlines()
@@ -163,6 +219,7 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
         strand_codes = {'+': "SENSE", '-': "ANTISENSE"}
         strand = strand_codes[strand] if strand in '+-' else 'NONE'
         coordinate = f'{chr}:{coord[1]-100}-{coord[2]+100}'
+
 
     palette = get_preset_palette()
 
@@ -240,9 +297,11 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
 
 
 def parse_coordinates(coord):
-    coord = coord.replace(",", "")
-    chr = coord.split(":")[0]
-    start, end = coord.split(":")[1].split("-")
+    coord = coord.replace(",", ":").replace("-", ":")
+    items = coord.split(":")
+    chr = items[0]
+    locs = [int(items[i]) for i in range(1, len(items))]
+    start, end = min(locs), max(locs)
     # Convert to 0-based
     start, end = int(start) - 1, int(end)
     return chr, start, end
