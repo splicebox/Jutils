@@ -62,7 +62,6 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
                 for coordinates, k in zip(coordinates_list, [9, 10]):
                     read_counts = [int(v) for v in items[k].split(',')]
                     for chr, _start, _end in coordinates:
-                        print(_start, end, _start-start-1, _end-start + 1, start, end)
                         for i, count in enumerate(read_counts):
                             if count < min_coverage:
                                 continue
