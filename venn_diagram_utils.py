@@ -24,6 +24,9 @@ def plot_venn_diagram(list_file, out_dir, p_value_threhold, q_value_threhold, dp
             if len(items) > 2:
                 options.append(items[2])
 
+    if options and (p_value_threhold != 1 or q_value_threhold != 1 or dpsi_threshold != 0):
+        print("Warning: Both command line and file-specific parameters detected, applied!")
+
     if len(files) > 6:
         print('As most 6 files are allowed, the program will automatically choose the first 6 files!')
         files = files[:6]
