@@ -99,6 +99,8 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
             data_df = data_df.drop(columns=['variance', 'index'])
 
     elif 'log2FoldChange' in original_columns:
+        if aggregate:
+            print('Warming: the aggregate mode will be ignore for DSA data!')
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
         data_df2 = data_df['ReadCount1'].str.split(',', expand=True).astype(float)
         data_df2.columns = samples
@@ -159,6 +161,8 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
             data_df = data_df.drop(columns=['dPSI', 'index'])
 
     elif 'log2FoldChange' in original_columns:
+        if aggregate:
+            print('Warming: the aggregate mode will be ignore for DSA data!')
         data_df = data_df[foldchange_threshold < abs(data_df['log2FoldChange'])]
         data_df = data_df[abs(data_df['log2FoldChange']) < float('inf')]
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
