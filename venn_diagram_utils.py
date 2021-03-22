@@ -15,7 +15,7 @@ def check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold):
     if not(0 <= p_value_threshold <= 1):
         raise Exception('p-value threshold must in range [0, 1]!')
     if not(0 <= q_value_threshold <= 1):
-        raise Exception('p-value threshold must in range [0, 1]!')
+        raise Exception('q-value threshold must in range [0, 1]!')
     if not(0 <= dpsi_threshold <= 1):
         raise Exception('dpsi threshold must in range [0, 1]!')
 
