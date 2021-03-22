@@ -5,10 +5,19 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def plot_heatmap(file, meta_file, out_dir, p_value_threhold, q_value_threhold,
+def check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold):
+    if not(0 <= p_value_threshold <= 1):
+        raise Exception('p-value threshold must in range [0, 1]!')
+    if not(0 <= q_value_threshold <= 1):
+        raise Exception('q-value threshold must in range [0, 1]!')
+    if not(0 <= dpsi_threshold <= 1):
+        raise Exception('dpsi threshold must in range [0, 1]!')
+
+
+def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
                  dpsi_threshold, foldchange_threshold, avg_threshold,
                  unsupervised, aggregate, method, metric, prefix, top):
-
+    check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold)
     samples = []
     conditions = []
     sample_cond_dict = {}
@@ -30,7 +39,7 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threhold, q_value_threhold,
         data_df = process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top)
     else:
         data_df = process_data_supervised(data_df, samples, sample_cond_dict, conditions, original_columns,
-                                          p_value_threhold, q_value_threhold, dpsi_threshold, foldchange_threshold,
+                                          p_value_threshold, q_value_threshold, dpsi_threshold, foldchange_threshold,
                                           avg_threshold, aggregate)
 
     generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
@@ -118,10 +127,10 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
 
 
 def process_data_supervised(data_df, samples, sample_cond_dict, conditions, original_columns,
-                            p_value_threhold, q_value_threhold, dpsi_threshold,
+                            p_value_threshold, q_value_threshold, dpsi_threshold,
                             foldchange_threshold, avg_threshold, aggregate):
-    data_df = data_df[data_df['p-value'] < p_value_threhold]
-    data_df = data_df[data_df['q-value'] < q_value_threhold]
+    data_df = data_df[data_df['p-value'] < p_value_threshold]
+    data_df = data_df[data_df['q-value'] < q_value_threshold]
     if np.any(data_df['GeneName'] != '.'):
         data_df = data_df[data_df['GeneName'] != '.']
 
