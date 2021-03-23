@@ -46,7 +46,7 @@ def get_arguments():
     h_parser.add_argument('--method', type=str, default='weighted',
                         help="clustering method. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'weighted')")
     h_parser.add_argument('--metric', type=str, default='cityblock',
-                        help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'braycurtis')")
+                        help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'cityblock')")
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
