@@ -82,7 +82,7 @@ def run_convert_results_module(args, parser_dict):
         convert_rmats_results(Path(args.rmats_dir), out_dir)
     if args.majiq_dir:
         convert_majiq_results(Path(args.majiq_dir), out_dir)
-    if not (args.mntjulip_dir or args.leafcutter_dir or args.rmats_dir):
+    if not (args.mntjulip_dir or args.leafcutter_dir or args.rmats_dir or args.majiq_dir):
         # raise Exception('Please specify at least a path to a program result folder!')
         parser_dict['convert-results'].print_help(sys.stderr)
 
