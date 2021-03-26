@@ -14,10 +14,36 @@ def check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold):
         raise Exception('dpsi threshold must in range [0, 1]!')
 
 
+def print_warming(original_columns, p_value, q_value, dpsi, foldchange, avg, unsupervised, aggregate):
+    if unsupervised:
+        if p_value != 0.05:
+            print('Warming: unsupervised mode, p-value option will be ignored!')
+        if q_value != 1.:
+            print('Warming: unsupervised mode, q-value option will be ignored!')
+        if dpsi != 0.05:
+            print('Warming: unsupervised mode, dpsi option will be ignored!')
+        if foldchange != 0:
+            print('Warming: unsupervised mode, fold-change option will be ignored!')
+        if 'dPSI' in original_columns:
+            if avg != 0:
+                print('Warming: processing DSR data, avg option will be ignored!')
+
+    else:
+        if 'dPSI' in original_columns:
+            if avg != 0:
+                print('Warming: processing DSR data, avg option will be ignored!')
+            if foldchange != 0:
+                print('Warming: processing DSR data, fold-change option will be ignored!')
+        elif 'log2FoldChange' in original_columns:
+            if dpsi != 0.05:
+                print('Warming: processing DSA data, dpsi option will be ignored!')
+
+
 def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
                  dpsi_threshold, foldchange_threshold, avg_threshold,
                  unsupervised, aggregate, method, metric, prefix, top):
     check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold)
+
     samples = []
     conditions = []
     sample_cond_dict = {}
@@ -35,6 +61,8 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
         raise Exception("Column 'ReadCount1' and 'PSI' don't contain values! This could happen if the TSV file is generated from MAJIQ outputs.")
         sys.exit('-1')
 
+    print_warming(original_columns, p_value_threshold, q_value_threshold, dpsi_threshold, foldchange_threshold,
+                  avg_threshold, unsupervised, aggregate)
     if unsupervised:
         data_df = process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top)
     else:
@@ -63,7 +91,6 @@ def process_group(x):
 
 
 def process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top_num):
-    print('Unsupervised mode, the option --q-value, --p-value, --dpsi, --fold-change will be ignored')
     if np.any(data_df['GeneName'] != '.'):
         data_df = data_df[data_df['GeneName'] != '.']
 
@@ -77,7 +104,7 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
             aggregate = False
 
         if aggregate:
-            data_df2 = data_df['PSI'].str.split(',', expand=True).astype(float)
+            data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
             data_df2.columns = samples
             data_df2[['GeneName', 'FeatureLabel', 'GroupID', 'dPSI']] = data_df[['GeneName', 'FeatureLabel', 'GroupID', 'dPSI']]
 
@@ -95,7 +122,7 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
             data_df5 = data_df5.sort_values(by=['variance'], ascending=False)
             data_df = data_df5.drop(columns=['variance'])
         else:
-            data_df2 = data_df['PSI'].str.split(',', expand=True).astype(float)
+            data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
             data_df2.columns = samples
 
             # data_df2['variance'] = data_df2.mean(axis=1) / data_df2.var(axis=1)
@@ -111,7 +138,7 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
         if aggregate:
             print('Warming: the aggregate mode will be ignore for DSA data!')
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
-        data_df2 = data_df['ReadCount1'].str.split(',', expand=True).astype(float)
+        data_df2 = data_df['ReadCount1'].str.split(',', expand=True).replace('NA', '0').astype(float)
         data_df2.columns = samples
         data_df2['variance'] = data_df2.var(axis=1) / data_df2.mean(axis=1)
         data_df2 = data_df2.apply(lambda x: np.log2(x + 1e-2))
@@ -143,7 +170,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
             selected_groups = data_df[abs(data_df['dPSI']) > dpsi_threshold]['GroupID'].drop_duplicates()
             data_df = data_df[data_df['GroupID'].isin(selected_groups)]
 
-            data_df2 = data_df['PSI'].str.split(',', expand=True).astype(float)
+            data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
             data_df2.columns = samples
             data_df2[['GeneName', 'FeatureLabel', 'GroupID', 'dPSI']] = data_df[['GeneName', 'FeatureLabel', 'GroupID', 'dPSI']]
 
@@ -159,7 +186,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
             data_df.index = groups.apply(process_group)
         else:
             data_df = data_df[abs(data_df['dPSI']) > dpsi_threshold]
-            data_df2 = data_df['PSI'].str.split(',', expand=True).astype(float)
+            data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
             data_df2.columns = samples
             data_df2['index'] = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
             data_df2['dPSI'] = np.abs(data_df['dPSI'])
@@ -175,7 +202,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
         data_df = data_df[foldchange_threshold < abs(data_df['log2FoldChange'])]
         data_df = data_df[abs(data_df['log2FoldChange']) < float('inf')]
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
-        data_df2 = data_df['ReadCount1'].str.split(',', expand=True).astype(float)
+        data_df2 = data_df['ReadCount1'].str.split(',', expand=True).replace('NA', '0').astype(float)
         data_df2.columns = samples
         data_df2.index = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
         data_df = data_df2.apply(lambda x: np.log2(x + 1e-2))
