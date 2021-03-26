@@ -51,34 +51,39 @@ python3 jutils.py heatmap --tsv-file "${result_dir}/mntjulip_DSA_results.tsv" \
                           --unsupervised
 
 # Venn Diagram
-echo "${result_dir}/mntjulip_DSR_results.tsv" > ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/leafcutter_results.tsv" >> ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/majiq_results.tsv" >> ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv" >> ${result_dir}/tsv_file_list.txt
+tsv_file="${result_dir}/tsv_file_list_1.txt"
+echo "${result_dir}/mntjulip_DSR_results.tsv" > ${tsv_file}
+echo "${result_dir}/leafcutter_results.tsv" >> ${tsv_file}
+echo "${result_dir}/majiq_results.tsv" >> ${tsv_file}
+echo "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv" >> ${tsv_file}
 
-python3 jutils.py venn-diagram --tsv-file-list "${result_dir}/tsv_file_list.txt" \
+python3 jutils.py venn-diagram --tsv-file-list ${tsv_file} \
                                --out-dir "${out_dir}" \
-                               --p-value 0.05 --q-value 1 --dpsi 0.05
+                               --p-value 0.05 --q-value 1 --dpsi 0.05 \
+                               --prefix test1
 
 # custom option for each tools
-rm -rf ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/leafcutter_results.tsv\tLeafCutter\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/majiq_results.tsv\tMAJIQ\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv\trMATs\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${result_dir}/tsv_file_list.txt
+tsv_file="${result_dir}/tsv_file_list_2.txt"
+echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${tsv_file}
+echo "${result_dir}/leafcutter_results.tsv\tLeafCutter\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
+echo "${result_dir}/majiq_results.tsv\tMAJIQ\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
+echo "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv\trMATs\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
 
-python3 jutils.py venn-diagram --tsv-file-list "${result_dir}/tsv_file_list.txt" \
-                               --out-dir "${out_dir}"
+python3 jutils.py venn-diagram --tsv-file-list ${tsv_file} \
+                               --out-dir "${out_dir}" \
+                               --prefix test2
+
 
 
 # custom option for each tools
-rm -rf ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP1\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP2\t'--p-value 0.05 --q-value 1 --dpsi 0.1'" >> ${result_dir}/tsv_file_list.txt
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP3\t'--p-value 0.05 --q-value 1 --dpsi 0.2'" >> ${result_dir}/tsv_file_list.txt
+tsv_file="${result_dir}/tsv_file_list_3.txt"
+echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP1\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${tsv_file}
+echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP2\t'--p-value 0.05 --q-value 1 --dpsi 0.1'" >> ${tsv_file}
+echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP3\t'--p-value 0.05 --q-value 1 --dpsi 0.2'" >> ${tsv_file}
 
-python3 jutils.py venn-diagram --tsv-file-list "${result_dir}/tsv_file_list.txt" \
-                               --out-dir "${out_dir}"
+python3 jutils.py venn-diagram --tsv-file-list ${tsv_file} \
+                               --out-dir "${out_dir}" \
+                               --prefix test3
 
 # Sashimi Plot
 # MntJULiP: (used g006855 for jutils paper)
