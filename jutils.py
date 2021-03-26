@@ -92,7 +92,7 @@ def run_venn_diagram_module(args, parser_dict):
         # raise Exception('Please provide the list file that contains the path of the TSV result files!')
         parser_dict['venn-diagram'].print_help(sys.stderr)
     else:
-        plot_venn_diagram(Path(args.tsv_file_list), Path(args.out_dir), args.p_value, args.q_value, args.dpsi)
+        plot_venn_diagram(Path(args.tsv_file_list), Path(args.out_dir), args.p_value, args.q_value, args.dpsi, args.prefix)
 
 
 def run_heatmap_module(args, parser_dict):
