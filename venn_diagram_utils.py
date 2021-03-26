@@ -20,7 +20,7 @@ def check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold):
         raise Exception('dpsi threshold must in range [0, 1]!')
 
 
-def plot_venn_diagram(list_file, out_dir, p_value_threshold, q_value_threshold, dpsi_threshold):
+def plot_venn_diagram(list_file, out_dir, p_value_threshold, q_value_threshold, dpsi_threshold, prefix):
     check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold)
     files = []
     alias = []
@@ -44,7 +44,6 @@ def plot_venn_diagram(list_file, out_dir, p_value_threshold, q_value_threshold, 
         options = options[:6] if options else []
 
     if options:
-        print('Options for each TSV file are provided, will overwrite global options!')
         parser = get_parser()
 
     names = []
@@ -77,9 +76,10 @@ def plot_venn_diagram(list_file, out_dir, p_value_threshold, q_value_threshold, 
                     genes.add(gene_name)
         genes_list.append(genes)
 
+    strings = [prefix]
     venn_method = getattr(venn, f'venn{len(files)}')
     labels = venn.get_labels(genes_list, fill=['number'])
     fig, ax = venn_method(labels, names=alias if alias else names)
     fig.patch.set_facecolor('white')
-    fig.savefig(out_dir / 'venn_diagram.png')
+    fig.savefig(out_dir / '_'.join(filter(None, strings + ['venn_diagram.png'])))
     plt.close()
