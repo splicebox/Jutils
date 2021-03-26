@@ -64,10 +64,10 @@ python3 jutils.py venn-diagram --tsv-file-list ${tsv_file} \
 
 # custom option for each tools
 tsv_file="${result_dir}/tsv_file_list_2.txt"
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${tsv_file}
-echo "${result_dir}/leafcutter_results.tsv\tLeafCutter\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
-echo "${result_dir}/majiq_results.tsv\tMAJIQ\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
-echo "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv\trMATs\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
+echo -e "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${tsv_file}
+echo -e "${result_dir}/leafcutter_results.tsv\tLeafCutter\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
+echo -e "${result_dir}/majiq_results.tsv\tMAJIQ\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
+echo -e "${result_dir}/rmats_ReadsOnTargetAndJunctionCounts_results.tsv\trMATs\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" >> ${tsv_file}
 
 python3 jutils.py venn-diagram --tsv-file-list ${tsv_file} \
                                --out-dir "${out_dir}" \
@@ -77,9 +77,9 @@ python3 jutils.py venn-diagram --tsv-file-list ${tsv_file} \
 
 # custom option for each tools
 tsv_file="${result_dir}/tsv_file_list_3.txt"
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP1\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${tsv_file}
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP2\t'--p-value 0.05 --q-value 1 --dpsi 0.1'" >> ${tsv_file}
-echo "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP3\t'--p-value 0.05 --q-value 1 --dpsi 0.2'" >> ${tsv_file}
+echo -e "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP1\t'--p-value 0.05 --q-value 1 --dpsi 0.05'" > ${tsv_file}
+echo -e "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP2\t'--p-value 0.05 --q-value 1 --dpsi 0.1'" >> ${tsv_file}
+echo -e "${result_dir}/mntjulip_DSR_results.tsv\tMntJULiP3\t'--p-value 0.05 --q-value 1 --dpsi 0.2'" >> ${tsv_file}
 
 python3 jutils.py venn-diagram --tsv-file-list ${tsv_file} \
                                --out-dir "${out_dir}" \
