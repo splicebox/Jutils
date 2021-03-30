@@ -45,6 +45,11 @@ Required Python packages: `pandas`, `numpy`, `seaborn`, `matplotlib`. The Python
 pip install --user pandas numpy seaborn matplotlib
 ```
 
+Required R packages: `ggplot2`. The R packags can be installed with the command in R console:   
+```
+install.packages("ggplot2")
+```
+
 ### <a name="usage" />  Usage
 Jutils works in two steps. *Step 1* generates the TSV file representation of the user data. *Step 2* uses the TSV file, along with other information optionally provided by the user, to generate visualizations. The basic commands are listed below, and examples as applied to the specific visualizations are given in the subsequent sections.
 
