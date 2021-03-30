@@ -37,6 +37,7 @@ git clone https://github.com/splicebox/Jutils.git
 #### System requirements
 * Linux or Darwin  
 * Python 3.7 or later
+* R 4.0.4 or later
 
 #### Prerequisites
 Required Python packages: `pandas`, `numpy`, `seaborn`, `matplotlib`. The Python packages can be installed with the command:   
