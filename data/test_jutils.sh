@@ -1,3 +1,5 @@
+#! /bin/bash -l
+
 git clone https://github.com/splicebox/Jutils.git
 cd Jutils
 
