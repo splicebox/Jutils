@@ -45,7 +45,7 @@ Required Python packages: `pandas`, `numpy`, `seaborn`, `matplotlib`. The Python
 pip install --user pandas numpy seaborn matplotlib
 ```
 
-Required R packages: `ggplot2`. The R packags can be installed with the command in R console:   
+Required R packages: `ggplot2`. The R package can be installed with the command in R console:   
 ```
 install.packages("ggplot2")
 ```
