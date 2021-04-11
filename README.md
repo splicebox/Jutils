@@ -4,7 +4,7 @@ Jutils (version 1.0) is a visualization toolkit for alternative splicing events.
 
 Described in:
 
-   Yang G, Cope L, He Z, and Florea L. (2020) Jutils: A visualization toolkit for differential alternative splicing events, *Submitted*.
+   Yang G, Cope L, He Z, and Florea L. (2020) Jutils: A visualization toolkit for differential alternative splicing events, *Under review*.
 
 Supplementary [scripts](https://github.com/splicebox/Jutils/blob/master/data/test_jutils.sh) and data described in the article can be found in the '[data](https://github.com/splicebox/Jutils/tree/master/data)' directory.
 
