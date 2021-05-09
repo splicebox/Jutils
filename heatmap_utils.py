@@ -14,7 +14,7 @@ def check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold):
         raise Exception('dpsi threshold must in range [0, 1]!')
 
 
-def print_warming(original_columns, p_value, q_value, dpsi, foldchange, avg, unsupervised, aggregate):
+def print_warming(original_columns, p_value, q_value, dpsi, foldchange, avg, unsupervised, aggregate, top):
     if unsupervised:
         if p_value != 0.05:
             print('Warming: unsupervised mode, p-value option will be ignored!')
@@ -37,11 +37,13 @@ def print_warming(original_columns, p_value, q_value, dpsi, foldchange, avg, uns
         elif 'log2FoldChange' in original_columns:
             if dpsi != 0.05:
                 print('Warming: processing DSA data, dpsi option will be ignored!')
+        if top != 100:
+            print('Warming: top option only works in unsupervised mode and will be ignored!')
 
 
 def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
                  dpsi_threshold, foldchange_threshold, avg_threshold,
-                 unsupervised, aggregate, method, metric, prefix, top):
+                 unsupervised, aggregate, method, metric, prefix, top, pdf):
     check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold)
 
     samples = []
@@ -62,7 +64,7 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
         sys.exit('-1')
 
     print_warming(original_columns, p_value_threshold, q_value_threshold, dpsi_threshold, foldchange_threshold,
-                  avg_threshold, unsupervised, aggregate)
+                  avg_threshold, unsupervised, aggregate, top)
     if unsupervised:
         data_df = process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top)
     else:
@@ -71,7 +73,7 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
                                           avg_threshold, aggregate)
 
     generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
-                      method, metric, prefix, aggregate, unsupervised, out_dir)
+                      method, metric, prefix, aggregate, unsupervised, out_dir, pdf)
 
 
 def truncate_gene_name(string):
@@ -148,7 +150,10 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
         data_df = data_df.sort_values(by=['variance'], ascending=False)
         data_df = data_df.drop(columns=['variance'])
 
-    num = min(top_num, data_df.shape[0])
+    num = data_df.shape[0]
+    if num > top_num:
+        print(f'There are {num} events and the top {top_num} events shown in heatmap (use "--top" option to change the number of events)!')
+        num = min(top_num, data_df.shape[0])
     data_df = data_df.iloc[:num, :]
     return data_df
 
@@ -210,7 +215,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
 
 
 def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
-                      method, metric, prefix, aggregate, unsupervised, out_dir):
+                      method, metric, prefix, aggregate, unsupervised, out_dir, pdf):
     num = data_df.shape[0]
     if num > 1000:
         print('Warming: number of rows > 1000, however, Jutils only allow 1000 rows for heatmap!')
@@ -238,6 +243,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
 
     legend_title = 'PSI' if 'dPSI' in original_columns else 'log2(exp)'
 
+    format = 'pdf' if pdf else 'png'
     figure = sns.clustermap(data_df, cmap="RdBu_r", col_cluster=False, z_score=0, vmin=-5, vmax=5,
                             metric=metric, method=method, mask=mask,
                             yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight), **clustermapParams)
@@ -245,7 +251,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     figure.ax_heatmap.set_facecolor("lightyellow")
     set_xtick_text_colors(figure, sample_cond_dict, conditions)
     figure.ax_cbar.set_title(f'{legend_title}_Z', fontsize=16)
-    figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap_Z.png'])))
+    figure.savefig(out_dir / '_'.join(filter(None, strings + [f'clustermap_Z.{format}'])))
     plt.close()
 
     figure = sns.clustermap(data_df, cmap="RdBu_r", z_score=0, vmin=-5, vmax=5,
@@ -255,7 +261,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     figure.ax_heatmap.set_facecolor("lightyellow")
     set_xtick_text_colors(figure, sample_cond_dict, conditions)
     figure.ax_cbar.set_title(f'{legend_title}_Z', fontsize=16)
-    figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap2_Z.png'])))
+    figure.savefig(out_dir / '_'.join(filter(None, strings + [f'clustermap2_Z.{format}'])))
     plt.close()
 
     if 'dPSI' in original_columns:
@@ -266,7 +272,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
         figure.ax_heatmap.set_facecolor("lightyellow")
         set_xtick_text_colors(figure, sample_cond_dict, conditions)
         figure.ax_cbar.set_title(legend_title, fontsize=16)
-        figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap.png'])))
+        figure.savefig(out_dir / '_'.join(filter(None, strings + [f'clustermap.{format}'])))
         plt.close()
 
         figure = sns.clustermap(data_df, cmap=sns.cm.rocket_r,
@@ -276,7 +282,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
         figure.ax_heatmap.set_facecolor("lightyellow")
         set_xtick_text_colors(figure, sample_cond_dict, conditions)
         figure.ax_cbar.set_title(legend_title, fontsize=16)
-        figure.savefig(out_dir / '_'.join(filter(None, strings + ['clustermap2.png'])))
+        figure.savefig(out_dir / '_'.join(filter(None, strings + [f'clustermap2.{format}'])))
         plt.close()
 
 
