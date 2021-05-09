@@ -75,9 +75,9 @@ python3 jutils.py heatmap --tsv-file <tsv_file> --meta-file <meta_file> [options
         --avg          cutoff for estimated read counts of DSA results (default 0.0)
         --fold-change  cutoff for log2(fold-change) of DSA results (default 0.0)
         --unsupervised display the top most variable features
-        --top          number of top most variable features to display 
-        --method       clustering method (default 300)
-        --metric       distance metric for clustering
+        --top          number of top most variable features to display (default 300)
+        --method       clustering method (default 'weighted')
+        --metric       distance metric for clustering ('cityblock')
         --prefix       add prefix to the output file name
         --out-dir      specify the output directory
 ```
