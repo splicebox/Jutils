@@ -28,6 +28,7 @@ def get_arguments():
     v_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     v_parser.add_argument('--dpsi', type=float, default=0.05, help='cutoff for delta PSI (Percent Splice In) (default 0.0)')
     v_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
+    v_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure in .pdf format')
 
     h_parser = subparser.add_parser('heatmap', help='')
     parser_dict['heatmap'] = h_parser
@@ -42,11 +43,12 @@ def get_arguments():
     h_parser.add_argument('--unsupervised', action='store_true', default=False, help='show results in an unsupervised way')
     h_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     h_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
-    h_parser.add_argument('--top', type=int, default=100, help='specify the number of top events to show in heatmap (default 300)')
+    h_parser.add_argument('--top', type=int, default=100, help='number of top most variable features to display, this option only works in the unsupervised mode (default 100)')
     h_parser.add_argument('--method', type=str, default='weighted',
                         help="clustering method. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'weighted')")
     h_parser.add_argument('--metric', type=str, default='cityblock',
                         help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'cityblock')")
+    h_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure in .pdf format')
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
@@ -62,6 +64,7 @@ def get_arguments():
     #     help="Strand specificity: <NONE> <SENSE> <ANTISENSE> <MATE1_SENSE> <MATE2_SENSE> [default=%(default)s]")
     s_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     s_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
+    s_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure(s) in .pdf format')
 
 
     if len(sys.argv) < 2:
@@ -92,7 +95,7 @@ def run_venn_diagram_module(args, parser_dict):
         # raise Exception('Please provide the list file that contains the path of the TSV result files!')
         parser_dict['venn-diagram'].print_help(sys.stderr)
     else:
-        plot_venn_diagram(Path(args.tsv_file_list), Path(args.out_dir), args.p_value, args.q_value, args.dpsi, args.prefix)
+        plot_venn_diagram(Path(args.tsv_file_list), Path(args.out_dir), args.p_value, args.q_value, args.dpsi, args.prefix, args.pdf)
 
 
 def run_heatmap_module(args, parser_dict):
@@ -102,17 +105,17 @@ def run_heatmap_module(args, parser_dict):
     else:
         plot_heatmap(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
                  args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
-                 args.aggregate, args.method, args.metric, args.prefix, args.top)
+                 args.aggregate, args.method, args.metric, args.prefix, args.top, args.pdf)
 
 
 def run_sashimi_module(args, parser_dict):
     if args.bam_list:
         sashimi_plot_with_bams(args.bam_list, args.coordinate, args.gtf, Path(args.out_dir),
                                args.prefix, args.shrink, 'NONE', args.min_coverage,
-                               args.group_id, args.tsv_file)
+                               args.group_id, args.tsv_file, args.pdf)
     elif args.tsv_file and args.meta_file and args.gtf:
         sashimi_plot_without_bams(args.tsv_file, args.meta_file, args.gtf, args.group_id,
-                                  Path(args.out_dir), args.prefix, args.shrink, args.min_coverage)
+                                  Path(args.out_dir), args.prefix, args.shrink, args.min_coverage, args.pdf)
     else:
     #     raise Exception(textwrap.dedent('''\
     # Please provide one of the two set of files,
