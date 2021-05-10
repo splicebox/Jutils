@@ -28,7 +28,7 @@ def get_arguments():
     v_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
     v_parser.add_argument('--dpsi', type=float, default=0.05, help='cutoff for delta PSI (Percent Splice In) (default 0.0)')
     v_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
-    v_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure in .pdf format')
+    v_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure(s) in .pdf format')
 
     h_parser = subparser.add_parser('heatmap', help='')
     parser_dict['heatmap'] = h_parser
@@ -48,7 +48,7 @@ def get_arguments():
                         help="clustering method. choose from 'single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward' (default 'weighted')")
     h_parser.add_argument('--metric', type=str, default='cityblock',
                         help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'cityblock')")
-    h_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure in .pdf format')
+    h_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure(s) in .pdf format')
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
