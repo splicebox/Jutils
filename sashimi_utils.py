@@ -3,7 +3,7 @@ import sys, re, copy, os, codecs, gzip
 from collections import OrderedDict
 
 
-def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefix, shrink, min_coverage):
+def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefix, shrink, min_coverage, pdf):
     with open(tsv_file, 'r') as f:
         lines = f.readlines()
 
@@ -109,8 +109,8 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
     R_script += colorize(color_dict, palette)
     R_script += make_R_lists(id_list, bam_dict[strand], overlay_dict, '', intersected_introns)
 
-    out_format = 'png'
-    out_file = out_dir / '_'.join(filter(None, [prefix, 'sashimi.png']))
+    out_format = 'pdf' if pdf else 'png'
+    out_file = out_dir / '_'.join(filter(None, [prefix, f'sashimi.{out_format}']))
     resolution = 300
     alpha = 0.5
     height = 3
@@ -180,7 +180,7 @@ def get_depths_from_gtf(file, coord, strand):
 
 
 def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, strand="NONE", min_coverage=1,
-                           group_id=None, tsv_file=None):
+                           group_id=None, tsv_file=None, pdf=False):
     if not group_id and not coordinate:
         raise Exception('Please specify either a coordinate or a group-id!')
         sys.exits(-1)
@@ -281,9 +281,9 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
 
         R_script += make_R_lists(id_list, bam_dict[strand], overlay_dict, '', intersected_introns)
 
-        out_format = 'png'
+        out_format = 'pdf' if pdf else 'png'
 
-        out_file = out_dir / '_'.join(filter(None, [prefix, 'sashimi.png']))
+        out_file = out_dir / '_'.join(filter(None, [prefix, f'sashimi.{out_format}']))
         resolution = 300
         alpha = 0.5
         height = 3
