@@ -1,6 +1,6 @@
 from collections import defaultdict, OrderedDict
 import numpy as np
-import gzip, os
+import gzip, os, glob
 
 from pathlib import Path
 
@@ -126,7 +126,10 @@ def convert_leafcutter_results(data_dir, out_dir):
 
 def convert_rmats_results(data_dir, out_dir):
     data_dir, out_dir = Path(data_dir), Path(out_dir)
-    for file_type in ['ReadsOnTargetAndJunctionCounts', 'JunctionCountOnly']:
+    file_typs = ['ReadsOnTargetAndJunctionCounts', 'JunctionCountOnly']
+    if not glob.glob(f'{data_dir}/*ReadsOnTargetAndJunctionCounts*'):
+        file_typs = ['JCEC', 'JC']
+    for file_type in file_typs:
         out_buffer = 'GeneName\tGroupID\tFeatureID\tFeatureType\tFeatureLabel\tstrand\tp-value\tq-value\tdPSI\tReadCount1\tReadCount2\tPSI\tpsi(cond1)\tpsi(cond2)\n'
         i = 1
         file = data_dir / f'SE.MATS.{file_type}.txt'
