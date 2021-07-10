@@ -126,71 +126,76 @@ def convert_leafcutter_results(data_dir, out_dir):
 
 def convert_rmats_results(data_dir, out_dir):
     data_dir, out_dir = Path(data_dir), Path(out_dir)
-    file_typs = ['ReadsOnTargetAndJunctionCounts', 'JunctionCountOnly']
+    file_types = ['ReadsOnTargetAndJunctionCounts', 'JunctionCountOnly']
     if not glob.glob(f'{data_dir}/*ReadsOnTargetAndJunctionCounts*'):
-        file_typs = ['JCEC', 'JC']
-    for file_type in file_typs:
+        file_types = ['JCEC', 'JC']
+    for file_type in file_types:
         out_buffer = 'GeneName\tGroupID\tFeatureID\tFeatureType\tFeatureLabel\tstrand\tp-value\tq-value\tdPSI\tReadCount1\tReadCount2\tPSI\tpsi(cond1)\tpsi(cond2)\n'
         i = 1
         file = data_dir / f'SE.MATS.{file_type}.txt'
-        with open(file, 'r') as f:
-            lines = f.readlines()
+        if file.exists():
+            with open(file, 'r') as f:
+                lines = f.readlines()
 
-        for line in lines[1:]:
-            fid, _, gene_name, _chr, strand, es, ee, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
-            label = f'{_chr}:{uee},{es}-{ee},{des}'
-            p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-            gene_name = gene_name[1:-1]
-            out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tSE\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
-            i += 1
+            for line in lines[1:]:
+                fid, _, gene_name, _chr, strand, es, ee, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                label = f'{_chr}:{uee},{es}-{ee},{des}'
+                p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
+                gene_name = gene_name[1:-1]
+                out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tSE\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
+                i += 1
 
         file = data_dir / f'RI.MATS.{file_type}.txt'
-        with open(file, 'r') as f:
-            lines = f.readlines()
+        if file.exists():
+            with open(file, 'r') as f:
+                lines = f.readlines()
 
-        for line in lines[1:]:
-            fid, _, gene_name, _chr, strand, _, _, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
-            label = f'{_chr}:{ues}-{uee}:{des}-{dee}'
-            p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-            gene_name = gene_name[1:-1]
-            out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tRI\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
-            i += 1
+            for line in lines[1:]:
+                fid, _, gene_name, _chr, strand, _, _, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                label = f'{_chr}:{ues}-{uee}:{des}-{dee}'
+                p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
+                gene_name = gene_name[1:-1]
+                out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tRI\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
+                i += 1
 
         file = data_dir / f'MXE.MATS.{file_type}.txt'
-        with open(file, 'r') as f:
-            lines = f.readlines()
+        if file.exists():
+            with open(file, 'r') as f:
+                lines = f.readlines()
 
-        for line in lines[1:]:
-            fid, _, gene_name, _chr, strand, es1, ee1, es2, ee2, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
-            label = f'{_chr}:{uee},{es1}-{ee1}:{es2}-{ee2},{des}'
-            p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-            gene_name = gene_name[1:-1]
-            out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tMXE\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
-            i += 1
+            for line in lines[1:]:
+                fid, _, gene_name, _chr, strand, es1, ee1, es2, ee2, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                label = f'{_chr}:{uee},{es1}-{ee1}:{es2}-{ee2},{des}'
+                p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
+                gene_name = gene_name[1:-1]
+                out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tMXE\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
+                i += 1
 
         file = data_dir / f'A5SS.MATS.{file_type}.txt'
-        with open(file, 'r') as f:
-            lines = f.readlines()
+        if file.exists():
+            with open(file, 'r') as f:
+                lines = f.readlines()
 
-        for line in lines[1:]:
-            fid, _, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
-            label = f'{_chr}:{les}-{lee}:{ses}-{see},{fes}'
-            p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-            gene_name = gene_name[1:-1]
-            out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tA5SS\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
-            i += 1
+            for line in lines[1:]:
+                fid, _, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                label = f'{_chr}:{les}-{lee}:{ses}-{see},{fes}'
+                p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
+                gene_name = gene_name[1:-1]
+                out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tA5SS\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
+                i += 1
 
         file = data_dir / f'A3SS.MATS.{file_type}.txt'
-        with open(file, 'r') as f:
-            lines = f.readlines()
+        if file.exists():
+            with open(file, 'r') as f:
+                lines = f.readlines()
 
-        for line in lines[1:]:
-            fid, _, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
-            label = f'{_chr}:{fee},{les}-{lee}:{ses}-{see}'
-            p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-            gene_name = gene_name[1:-1]
-            out_buffer += f'{gene_name}\tJ{i:06d}\t{fid}\tA3SS\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
-            i += 1
+            for line in lines[1:]:
+                fid, _, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                label = f'{_chr}:{fee},{les}-{lee}:{ses}-{see}'
+                p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
+                gene_name = gene_name[1:-1]
+                out_buffer += f'{gene_name}\tJ{i:06d}\t{fid}\tA3SS\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
+                i += 1
 
         file = out_dir / f'rmats_{file_type}_results.tsv'
         with open(file, 'w') as f:
