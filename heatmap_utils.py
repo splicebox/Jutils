@@ -129,7 +129,10 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
 
             # data_df2['variance'] = data_df2.mean(axis=1) / data_df2.var(axis=1)
             data_df2['variance'] = data_df2.sub(data_df2.mean(axis=1), axis=0).abs().mean(axis=1)
-            data_df2['index'] = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+            if (data_df['FeatureType'] == 'intron').all():
+                data_df2['index'] = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+            else:
+                data_df2['index'] = data_df[['GeneName', 'FeatureLabel', 'FeatureType']].agg('_'.join, axis=1)
 
             groups = data_df2.groupby(['index'])
             data_df = groups.apply(lambda x: x.iloc[x['variance'].argmax()])
@@ -145,7 +148,10 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
         data_df2['variance'] = data_df2.var(axis=1) / data_df2.mean(axis=1)
         data_df2 = data_df2.apply(lambda x: np.log2(x + 1e-2))
         # data_df2['variance'] = data_df2.mean(axis=1) / data_df2.var(axis=1)
-        data_df2.index = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+        if (data_df['FeatureType'] == 'intron').all():
+            data_df2.index = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+        else:
+            data_df2.index = data_df[['GeneName', 'FeatureLabel', 'FeatureType']].agg('_'.join, axis=1)
         data_df = data_df2
         data_df = data_df.sort_values(by=['variance'], ascending=False)
         data_df = data_df.drop(columns=['variance'])
@@ -193,7 +199,10 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
             data_df = data_df[abs(data_df['dPSI']) > dpsi_threshold]
             data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
             data_df2.columns = samples
-            data_df2['index'] = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+            if (data_df['FeatureType'] == 'intron').all():
+                data_df2['index'] = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+            else:
+                data_df2['index'] = data_df[['GeneName', 'FeatureLabel', 'FeatureType']].agg('_'.join, axis=1)
             data_df2['dPSI'] = np.abs(data_df['dPSI'])
 
             groups = data_df2.groupby(['index'])
@@ -209,7 +218,10 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
         data_df2 = data_df['ReadCount1'].str.split(',', expand=True).replace('NA', '0').astype(float)
         data_df2.columns = samples
-        data_df2.index = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+        if (data_df['FeatureType'] == 'intron').all():
+            data_df2.index = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
+        else:
+            data_df2.index = data_df[['GeneName', 'FeatureLabel', 'FeatureType']].agg('_'.join, axis=1)
         data_df = data_df2.apply(lambda x: np.log2(x + 1e-2))
     return data_df
 
