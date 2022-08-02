@@ -182,6 +182,8 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
             data_df = data_df[data_df['GroupID'].isin(selected_groups)]
 
             data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
+            if data_df2.empty:
+                sys.exit('Result set is empty. Exiting...')
             data_df2.columns = samples
             data_df2[['GeneName', 'FeatureLabel', 'GroupID', 'dPSI']] = data_df[['GeneName', 'FeatureLabel', 'GroupID', 'dPSI']]
 
