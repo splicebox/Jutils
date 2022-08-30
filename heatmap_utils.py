@@ -71,7 +71,6 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
         data_df = process_data_supervised(data_df, samples, sample_cond_dict, conditions, original_columns,
                                           p_value_threshold, q_value_threshold, dpsi_threshold, foldchange_threshold,
                                           avg_threshold, aggregate)
-
     generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
                       method, metric, prefix, aggregate, unsupervised, out_dir, pdf)
 
@@ -86,11 +85,20 @@ def truncate_gene_name(string):
 def process_group(x):
     start, end = float('inf'), 0
     for label in x['FeatureLabel']:
+        if ',' in label or label.count(':') == 2:
+            # rmats
+            # chrX:111727445,111727613-111727770,111728184
+            # chr20:58909349-58909423:58909520-5890957
+            if len(x['FeatureLabel']) <= 1:
+                return f"{x['GeneName'].iloc[0]}_{label}"
+            else:
+                l = len(x['FeatureLabel'])
+                raise ValueError(f'rMATs data has {l} records per group')
+        # non-rmats
         _chr, coord = label.split(':')
         _start, _end = (int(v) for v in coord.split('-'))
         start, end = min(start, _start), max(end, _end)
     return f"{x['GeneName'].iloc[0]}_{_chr}:{start}-{end}"
-
 
 def process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top_num):
     if np.any(data_df['GeneName'] != '.'):
@@ -167,10 +175,15 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
 def process_data_supervised(data_df, samples, sample_cond_dict, conditions, original_columns,
                             p_value_threshold, q_value_threshold, dpsi_threshold,
                             foldchange_threshold, avg_threshold, aggregate):
+    print('111111111111111')
+    print(data_df)
     data_df = data_df[data_df['p-value'] < p_value_threshold]
+    print(data_df)
     data_df = data_df[data_df['q-value'] < q_value_threshold]
+    print(data_df)
     if np.any(data_df['GeneName'] != '.'):
         data_df = data_df[data_df['GeneName'] != '.']
+    print(data_df)
 
     if 'dPSI' in original_columns:
         if data_df.shape[1] > 14 and aggregate:
@@ -234,6 +247,9 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     if num > 1000:
         print('Warming: number of rows > 1000, however, Jutils only allow 1000 rows for heatmap!')
         data_df = data_df.iloc[:1000, :]
+    elif num < 2:
+        print('Warming: number of rows < 2, data are not enough to generate heatmaps. Skipping...')
+        return
 
     mask = data_df.isnull()
     data_df = data_df.fillna(0)
