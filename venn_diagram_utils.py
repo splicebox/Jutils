@@ -71,7 +71,7 @@ def plot_venn_diagram(list_file, out_dir, p_value_threshold, q_value_threshold, 
             q_value = 0 if q_value == '.' else float(q_value)
             dpsi = 1 if dpsi == '.' else float(dpsi)
 
-            if p_value < l_p_value_threshold and q_value < l_q_value_threshold and abs(dpsi) > l_dpsi_threshold:
+            if p_value <= l_p_value_threshold and q_value <= l_q_value_threshold and abs(dpsi) >= l_dpsi_threshold:
                 for gene_name in gene_names.split('.'):
                     genes.add(gene_name)
         genes_list.append(genes)
