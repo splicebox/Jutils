@@ -150,7 +150,7 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
     elif 'log2FoldChange' in original_columns:
         if aggregate:
             print('Warming: the aggregate mode will be ignore for DSA data!')
-        data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
+        data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x >= avg_threshold) ,axis=1)]
         data_df2 = data_df['ReadCount1'].str.split(',', expand=True).replace('NA', '0').astype(float)
         data_df2.columns = samples
         data_df2['variance'] = data_df2.var(axis=1) / data_df2.mean(axis=1)
@@ -175,15 +175,10 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
 def process_data_supervised(data_df, samples, sample_cond_dict, conditions, original_columns,
                             p_value_threshold, q_value_threshold, dpsi_threshold,
                             foldchange_threshold, avg_threshold, aggregate):
-    print('111111111111111')
-    print(data_df)
-    data_df = data_df[data_df['p-value'] < p_value_threshold]
-    print(data_df)
-    data_df = data_df[data_df['q-value'] < q_value_threshold]
-    print(data_df)
+    data_df = data_df[data_df['p-value'] <= p_value_threshold]
+    data_df = data_df[data_df['q-value'] <= q_value_threshold]
     if np.any(data_df['GeneName'] != '.'):
         data_df = data_df[data_df['GeneName'] != '.']
-    print(data_df)
 
     if 'dPSI' in original_columns:
         if data_df.shape[1] > 14 and aggregate:
@@ -191,7 +186,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
             aggregate = False
 
         if aggregate:
-            selected_groups = data_df[abs(data_df['dPSI']) > dpsi_threshold]['GroupID'].drop_duplicates()
+            selected_groups = data_df[abs(data_df['dPSI']) >= dpsi_threshold]['GroupID'].drop_duplicates()
             data_df = data_df[data_df['GroupID'].isin(selected_groups)]
 
             data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
@@ -211,7 +206,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
             data_df = groups.apply(lambda x: np.sum(x[samples], axis=0))
             data_df.index = groups.apply(process_group)
         else:
-            data_df = data_df[abs(data_df['dPSI']) > dpsi_threshold]
+            data_df = data_df[abs(data_df['dPSI']) >= dpsi_threshold]
             data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
             data_df2.columns = samples
             if (data_df['FeatureType'] == 'intron').all():
@@ -228,9 +223,9 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
     elif 'log2FoldChange' in original_columns:
         if aggregate:
             print('Warming: the aggregate mode will be ignore for DSA data!')
-        data_df = data_df[foldchange_threshold < abs(data_df['log2FoldChange'])]
-        data_df = data_df[abs(data_df['log2FoldChange']) < float('inf')]
-        data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x > avg_threshold) ,axis=1)]
+        data_df = data_df[foldchange_threshold <= abs(data_df['log2FoldChange'])]
+        data_df = data_df[abs(data_df['log2FoldChange']) <= float('inf')]
+        data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x >= avg_threshold) ,axis=1)]
         data_df2 = data_df['ReadCount1'].str.split(',', expand=True).replace('NA', '0').astype(float)
         data_df2.columns = samples
         if (data_df['FeatureType'] == 'intron').all():
