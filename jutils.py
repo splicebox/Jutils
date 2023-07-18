@@ -75,8 +75,7 @@ def get_arguments():
 
 
 def run_convert_results_module(args, parser_dict):
-    out_dir = Path(args.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    
     if args.mntjulip_dir:
         convert_mntjulip_results(Path(args.mntjulip_dir), out_dir)
     if args.leafcutter_dir:
@@ -128,6 +127,8 @@ def run_sashimi_module(args, parser_dict):
 def main():
     args, parser_dict = get_arguments()
 
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
     if args.command == 'convert-results':
         run_convert_results_module(args, parser_dict)
 
