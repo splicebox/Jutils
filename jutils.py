@@ -77,13 +77,13 @@ def get_arguments():
 def run_convert_results_module(args, parser_dict):
     
     if args.mntjulip_dir:
-        convert_mntjulip_results(Path(args.mntjulip_dir), out_dir)
+        convert_mntjulip_results(Path(args.mntjulip_dir), Path(args.out_dir))
     if args.leafcutter_dir:
-        convert_leafcutter_results(Path(args.leafcutter_dir), out_dir)
+        convert_leafcutter_results(Path(args.leafcutter_dir), Path(args.out_dir))
     if args.rmats_dir:
-        convert_rmats_results(Path(args.rmats_dir), out_dir)
+        convert_rmats_results(Path(args.rmats_dir), Path(args.out_dir))
     if args.majiq_dir:
-        convert_majiq_results(Path(args.majiq_dir), out_dir)
+        convert_majiq_results(Path(args.majiq_dir), Path(args.out_dir))
     if not (args.mntjulip_dir or args.leafcutter_dir or args.rmats_dir or args.majiq_dir):
         # raise Exception('Please specify at least a path to a program result folder!')
         parser_dict['convert-results'].print_help(sys.stderr)
