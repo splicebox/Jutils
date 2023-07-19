@@ -123,11 +123,11 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
 
 
 def parse_rmats_coordinates(label):
-    p1 = "\w*\d*:\d+,\d+-\d+,\d+"  # SE: '{_chr}:{uee},{es}-{ee},{des}'
-    p2 = "\w*\d*:\d+-\d+:\d+-\d+"  # IR: '{_chr}:{ues}-{uee}:{des}-{dee}'
-    p3 = "\w*\d*:\d+,\d+-\d+:\d+-\d+,\d+"  # MXE: '{_chr}:{uee},{es1}-{ee1}:{es2}-{ee2},{des}'
-    p4 = "\w*\d*:\d+-\d+:\d+-\d+,\d+"  # A5SS: '{_chr}:{les}-{lee}:{ses}-{see},{fes}'
-    p5 = "\w*\d*:\d+,\d+-\d+:\d+-\d+"  # A3SS: '{_chr}:{fee},{les}-{lee}:{ses}-{see}'
+    p1 = "\w*\d*\.*\d*:\d+,\d+-\d+,\d+"  # SE: '{_chr}:{uee},{es}-{ee},{des}'
+    p2 = "\w*\d*\.*\d*:\d+-\d+:\d+-\d+"  # IR: '{_chr}:{ues}-{uee}:{des}-{dee}'
+    p3 = "\w*\d*\.*\d*:\d+,\d+-\d+:\d+-\d+,\d+"  # MXE: '{_chr}:{uee},{es1}-{ee1}:{es2}-{ee2},{des}'
+    p4 = "\w*\d*\.*\d*:\d+-\d+:\d+-\d+,\d+"  # A5SS: '{_chr}:{les}-{lee}:{ses}-{see},{fes}'
+    p5 = "\w*\d*\.*\d*:\d+,\d+-\d+:\d+-\d+"  # A3SS: '{_chr}:{fee},{les}-{lee}:{ses}-{see}'
 
     if re.match(p1, label):
         chr, uee, es, ee, des = label.replace(',', ':').replace('-', ':').split(':')
