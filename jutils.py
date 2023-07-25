@@ -56,9 +56,11 @@ def get_arguments():
     s_parser.add_argument('--tsv-file', type=str, help='a TSV file that contains the extracted results')
     s_parser.add_argument('--meta-file', type=str, help='a TAB separated file that contains the sample name and conditions')
     s_parser.add_argument('--coordinate', type=str, help='select genomic range for visualization (e.g. chr1:123456-234567)')
+    #  TODO gtf optional
     s_parser.add_argument('--gtf', type=str, help='a GTF file with gene annotations')
     s_parser.add_argument('--shrink', action='store_true', default=False, help='shrink long introns and exons')
-    s_parser.add_argument("--min-coverage", type=int, default=3, help='minimum intron coverage')
+    #  TODO filter min-coverage of average
+    s_parser.add_argument("--min-coverage", type=int, default=0, help='minimum intron coverage')
     s_parser.add_argument("--group-id", type=str, help='Specify the group id')
     # s_parser.add_argument("--strand", default="NONE", type=str,
     #     help="Strand specificity: <NONE> <SENSE> <ANTISENSE> <MATE1_SENSE> <MATE2_SENSE> [default=%(default)s]")

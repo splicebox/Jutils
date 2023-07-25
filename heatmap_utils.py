@@ -17,28 +17,28 @@ def check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold):
 def print_warming(original_columns, p_value, q_value, dpsi, foldchange, avg, unsupervised, aggregate, top):
     if unsupervised:
         if p_value != 0.05:
-            print('Warming: unsupervised mode, p-value option will be ignored!')
+            print('Warning: unsupervised mode, p-value option will be ignored!')
         if q_value != 1.:
-            print('Warming: unsupervised mode, q-value option will be ignored!')
+            print('Warning: unsupervised mode, q-value option will be ignored!')
         if dpsi != 0.05:
-            print('Warming: unsupervised mode, dpsi option will be ignored!')
+            print('Warning: unsupervised mode, dpsi option will be ignored!')
         if foldchange != 0:
-            print('Warming: unsupervised mode, fold-change option will be ignored!')
+            print('Warning: unsupervised mode, fold-change option will be ignored!')
         if 'dPSI' in original_columns:
             if avg != 0:
-                print('Warming: processing DSR data, avg option will be ignored!')
+                print('Warning: processing DSR data, avg option will be ignored!')
 
     else:
         if 'dPSI' in original_columns:
             if avg != 0:
-                print('Warming: processing DSR data, avg option will be ignored!')
+                print('Warning: processing DSR data, avg option will be ignored!')
             if foldchange != 0:
-                print('Warming: processing DSR data, fold-change option will be ignored!')
+                print('Warning: processing DSR data, fold-change option will be ignored!')
         elif 'log2FoldChange' in original_columns:
             if dpsi != 0.05:
-                print('Warming: processing DSA data, dpsi option will be ignored!')
+                print('Warning: processing DSA data, dpsi option will be ignored!')
         if top != 100:
-            print('Warming: top option only works in unsupervised mode and will be ignored!')
+            print('Warning: top option only works in unsupervised mode and will be ignored!')
 
 
 def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
@@ -149,7 +149,7 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
 
     elif 'log2FoldChange' in original_columns:
         if aggregate:
-            print('Warming: the aggregate mode will be ignore for DSA data!')
+            print('Warning: the aggregate mode will be ignore for DSA data!')
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x >= avg_threshold) ,axis=1)]
         data_df2 = data_df['ReadCount1'].str.split(',', expand=True).replace('NA', '0').astype(float)
         data_df2.columns = samples
@@ -179,6 +179,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
     data_df = data_df[data_df['q-value'] <= q_value_threshold]
     if np.any(data_df['GeneName'] != '.'):
         data_df = data_df[data_df['GeneName'] != '.']
+
 
     if 'dPSI' in original_columns:
         if data_df.shape[1] > 14 and aggregate:
@@ -222,7 +223,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
 
     elif 'log2FoldChange' in original_columns:
         if aggregate:
-            print('Warming: the aggregate mode will be ignore for DSA data!')
+            print('Warning: the aggregate mode will be ignore for DSA data!')
         data_df = data_df[foldchange_threshold <= abs(data_df['log2FoldChange'])]
         data_df = data_df[abs(data_df['log2FoldChange']) <= float('inf')]
         data_df = data_df[data_df.iloc[:, 12:].apply(lambda x: np.any(x >= avg_threshold) ,axis=1)]
@@ -240,10 +241,10 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
                       method, metric, prefix, aggregate, unsupervised, out_dir, pdf):
     num = data_df.shape[0]
     if num > 1000:
-        print('Warming: number of rows > 1000, however, Jutils only allow 1000 rows for heatmap!')
+        print('Warning: number of rows > 1000, however, Jutils only allow 1000 rows for heatmap!')
         data_df = data_df.iloc[:1000, :]
     elif num < 2:
-        print('Warming: number of rows < 2, data are not enough to generate heatmaps. Skipping...')
+        print('Warning: number of rows < 2, data are not enough to generate heatmaps. Skipping...')
         return
 
     mask = data_df.isnull()

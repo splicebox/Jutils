@@ -191,7 +191,7 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
             sys.exits(-1)
 
         if coordinate:
-            print('Warming: Jutils generates the Sashimi plot based on the provided group-id, the coordinate will be ignored!')
+            print('Warning: Jutils generates the Sashimi plot based on the provided group-id, the coordinate will be ignored!')
 
         with open(tsv_file, 'r') as f:
             lines = f.readlines()
