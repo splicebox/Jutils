@@ -107,7 +107,7 @@ python3 jutils.py sashimi --tsv-file <tsv_file> --meta-file <meta_file> --gtf <g
         --gtf           GTF file of gene annotations to extract exons not in the TSV file
         options:
         --shrink        shrink long introns and exons
-        --min-coverage  minimum intron coverage
+        --min-coverage  minimum intron coverage (default 0)
         --prefix        add prefix to the output file name
         --out-dir       specify the output directory
         --pdf           generate figures in PDF format (default PNG)
