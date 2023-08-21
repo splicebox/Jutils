@@ -49,6 +49,7 @@ def get_arguments():
     h_parser.add_argument('--metric', type=str, default='cityblock',
                         help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'cityblock')")
     h_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure(s) in .pdf format')
+    h_parser.add_argument('--gene-list-file', type=str, default='', help='list of target genes (one gene per line without space) for heatmap')
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
@@ -106,7 +107,7 @@ def run_heatmap_module(args, parser_dict):
     else:
         plot_heatmap(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
                  args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
-                 args.aggregate, args.method, args.metric, args.prefix, args.top, args.pdf)
+                 args.aggregate, args.method, args.metric, args.prefix, args.top, args.pdf, args.gene_list_file)
 
 
 def run_sashimi_module(args, parser_dict):

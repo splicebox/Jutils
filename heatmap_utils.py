@@ -14,7 +14,7 @@ def check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold):
         raise Exception('dpsi threshold must in range [0, 1]!')
 
 
-def print_warming(original_columns, p_value, q_value, dpsi, foldchange, avg, unsupervised, aggregate, top):
+def print_warning(original_columns, p_value, q_value, dpsi, foldchange, avg, unsupervised, aggregate, top):
     if unsupervised:
         if p_value != 0.05:
             print('Warning: unsupervised mode, p-value option will be ignored!')
@@ -40,10 +40,19 @@ def print_warming(original_columns, p_value, q_value, dpsi, foldchange, avg, uns
         if top != 100:
             print('Warning: top option only works in unsupervised mode and will be ignored!')
 
+def parse_gene_list(gene_list_file):
+    gene_list=[]
+    with open(gene_list_file) as fi:
+        for line in fi:
+            if ' ' in line:
+                sys.exit('Invalid format: space. Exiting...')
+            else:
+                gene_list.append(line.strip())
+    return gene_list
 
 def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
                  dpsi_threshold, foldchange_threshold, avg_threshold,
-                 unsupervised, aggregate, method, metric, prefix, top, pdf):
+                 unsupervised, aggregate, method, metric, prefix, top, pdf, gene_list_file):
     check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold)
 
     samples = []
@@ -57,13 +66,17 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
             sample_cond_dict[sample] = cond
 
     data_df = pd.read_csv(file, sep='\t', comment='#')
+    if gene_list_file:
+        gene_list=parse_gene_list(gene_list_file)
+        data_df=data_df[data_df['GeneName'].isin(gene_list)]
     data_df['GeneName'] = data_df['GeneName'].apply(truncate_gene_name)
+
     original_columns = data_df.columns
     if np.all(data_df['ReadCount1'] == '.') and np.all(data_df['PSI'] == '.'):
         raise Exception("Column 'ReadCount1' and 'PSI' don't contain values! This could happen if the TSV file is generated from MAJIQ outputs.")
         sys.exit('-1')
 
-    print_warming(original_columns, p_value_threshold, q_value_threshold, dpsi_threshold, foldchange_threshold,
+    print_warning(original_columns, p_value_threshold, q_value_threshold, dpsi_threshold, foldchange_threshold,
                   avg_threshold, unsupervised, aggregate, top)
     if unsupervised:
         data_df = process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top)
@@ -209,6 +222,8 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
         else:
             data_df = data_df[abs(data_df['dPSI']) >= dpsi_threshold]
             data_df2 = data_df['PSI'].str.split(',', expand=True).replace('NA', '0').astype(float)
+            if data_df2.empty:
+                sys.exit('Result set is empty. Exiting...')
             data_df2.columns = samples
             if (data_df['FeatureType'] == 'intron').all():
                 data_df2['index'] = data_df[['GeneName', 'FeatureLabel']].agg('_'.join, axis=1)
@@ -255,6 +270,18 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     }
     figureWidth = data_df.shape[1] / 4
     figureHeight= data_df.shape[0] / 4
+    num_row=data_df.shape[0]
+
+    # step function for dendrogram_height_ratio
+    step_func_upper_bound=0.1
+    step_func_lower_bound=0.03
+    if num_row<=100:
+        dendrogram_height_ratio=step_func_upper_bound
+    elif num_row>100 and num_row<=500:
+        dendrogram_height_ratio=step_func_upper_bound-(step_func_upper_bound-step_func_lower_bound)*(num_row-100)/(500-100)
+    elif num_row>500:
+        dendrogram_height_ratio=step_func_lower_bound
+    #dendrogram_height_ratio=0.0008*data_df.shape[1]
     if figureHeight < 15:
         figureHeight = 15
     if figureWidth < 15:
@@ -272,8 +299,12 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     format = 'pdf' if pdf else 'png'
     figure = sns.clustermap(data_df, cmap="RdBu_r", col_cluster=False, z_score=0, vmin=-5, vmax=5,
                             metric=metric, method=method, mask=mask,
-                            yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight), **clustermapParams)
-
+                            yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight),dendrogram_ratio=(0.2,dendrogram_height_ratio),cbar_pos=(0.02, 1-dendrogram_height_ratio, .02, .03), **clustermapParams)
+    
+    #  put color bar at the right
+    #figure.fig.subplots_adjust(right=0.7)
+    #figure.ax_cbar.set_position((0.02, .95, .02, .04))
+    
     figure.ax_heatmap.set_facecolor("lightyellow")
     set_xtick_text_colors(figure, sample_cond_dict, conditions)
     figure.ax_cbar.set_title(f'{legend_title}_Z', fontsize=16)
@@ -282,7 +313,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
 
     figure = sns.clustermap(data_df, cmap="RdBu_r", z_score=0, vmin=-5, vmax=5,
                             metric=metric, method=method, mask=mask,
-                            yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight), **clustermapParams)
+                            yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight),dendrogram_ratio=(0.2,dendrogram_height_ratio),cbar_pos=(0.02, 1-dendrogram_height_ratio, .02, .03), **clustermapParams)
 
     figure.ax_heatmap.set_facecolor("lightyellow")
     set_xtick_text_colors(figure, sample_cond_dict, conditions)
@@ -293,7 +324,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     if 'dPSI' in original_columns:
         figure = sns.clustermap(data_df, cmap=sns.cm.rocket_r, col_cluster=False,
                                 metric=metric, method=method, mask=mask,
-                                yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight), **clustermapParams)
+                                yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight),dendrogram_ratio=(0.2,dendrogram_height_ratio),cbar_pos=(0.02, 1-dendrogram_height_ratio, .02, .03), **clustermapParams)
 
         figure.ax_heatmap.set_facecolor("lightyellow")
         set_xtick_text_colors(figure, sample_cond_dict, conditions)
@@ -303,7 +334,7 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
 
         figure = sns.clustermap(data_df, cmap=sns.cm.rocket_r,
                                 metric=metric, method=method, mask=mask,
-                                yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight), **clustermapParams)
+                                yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight),dendrogram_ratio=(0.2,dendrogram_height_ratio),cbar_pos=(0.02, 1-dendrogram_height_ratio, .02, .03), **clustermapParams)
 
         figure.ax_heatmap.set_facecolor("lightyellow")
         set_xtick_text_colors(figure, sample_cond_dict, conditions)
