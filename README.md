@@ -108,12 +108,12 @@ python3 jutils.py sashimi --tsv-file <tsv_file> --meta-file <meta_file> --gtf <g
         --gtf           GTF file of gene annotations to extract exons not in the TSV file
         options:
         --shrink        shrink long introns and exons
-        --min-coverage  minimum intron coverage
+        --min-coverage  minimum intron coverage (default 0)
         --prefix        add prefix to the output file name
         --out-dir       specify the output directory
         --pdf           generate figures in PDF format (default PNG)
 ```
-The streamlined command above will use solely the event information contained in the TSV and metadata files for visualization. Introns will be displayed along with their values (e.g., read counts, PSI value) in multiple samples, separately by the conditions specified in the metadata file. Exons are extracted from the provided GTF file of gene annotations, for instance the human or mouse [GENCODE](https://www.gencodegenes.org) reference gene set. Introns with a minimum coverage level (default 3 reads, and can be changed with the option `--min-coverage`) are shown, and long introns and exons can be shortened with the option `--shrink`.
+The streamlined command above will use solely the event information contained in the TSV and metadata files for visualization. Introns will be displayed along with their values (e.g., read counts, PSI value) in multiple samples, separately by the conditions specified in the metadata file. Exons are extracted from the provided GTF file of gene annotations, for instance the human or mouse [GENCODE](https://www.gencodegenes.org) reference gene set. Please ensure that the annotation file is compatible with the version of the genome used. Introns with a minimum coverage level (default 0 reads, and can be changed with the option `--min-coverage`) are shown, and long introns and exons can be shortened with the option `--shrink`.
 
 Alternatively, the command below extracts the information on flanking exon coverage from the BAM files, when provided by the user, and generates traditional sashimi visualizations:
 
@@ -124,7 +124,7 @@ python3 jutils.py sashimi --bam-list <bam_list.tsv> --coordinate <coords> --gtf 
         --gtf           GTF file with gene annotations to add to the display
         options:
         --shrink        shrink long introns and exons
-        --min-coverage  minimum intron coverage
+        --min-coverage  minimum intron coverage (default 0)
         --prefix        add prefix to the output file name
         --out-dir       specify the output directory
         --pdf           generate figures in PDF format (default PNG)
