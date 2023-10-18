@@ -65,7 +65,7 @@ def plot_heatmap(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
             conditions.append(cond)
             sample_cond_dict[sample] = cond
 
-    data_df = pd.read_csv(file, sep='\t', comment='#')
+    data_df = pd.read_csv(file, sep='\t', comment='#', dtype={'GeneName': str})
     if gene_list_file:
         gene_list=parse_gene_list(gene_list_file)
         data_df=data_df[data_df['GeneName'].isin(gene_list)]
