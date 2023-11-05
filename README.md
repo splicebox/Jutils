@@ -280,12 +280,12 @@ Xkr4   J000001   J000001  intron  chr1:3207317-3213439  -   0.383576   1   -0.22
 ```
 
 #### The meta-file
-The meta-file is a TAB ('\t') separated file that lists the sample names and conditions, for example:
+The meta-file is a TAB ('\t') separated file that lists the sample names and conditions, **firstly sorted by condition and secondly sorted by sample names**, for example:
 ```
-sample1  ctrl
-sample2  ctrl
-sample3  case
-sample4  case
+sample3  0
+sample4  0
+sample1  1
+sample2  1
 ```
 #### The bam_list file
 The bam list file is a TAB ('\t') separated file containing the full path to the BAM alignment file, along with the sample name and condition, as used by the (traditional) sashimi visualization:
