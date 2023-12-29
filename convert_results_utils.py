@@ -207,6 +207,14 @@ def convert_mntjulip_results(data_dir, out_dir):
     convert_mntjulip_DSR_results(data_dir, out_dir)
     convert_mntjulip_DSA_results(data_dir, out_dir)
 
+def write_mntjulip_results(out_fn, header, out_buffer, out_dict):
+    file = out_fn
+    with open(file, 'w') as f:
+        f.write(header)
+        f.write(out_buffer + '\n')
+        for info in out_dict.values():
+            f.write(info + '\n')
+
 
 def convert_mntjulip_DSR_results(data_dir, out_dir):
     def strs_to_floats(counts):
@@ -258,6 +266,7 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
     items = lines[0].strip().split('\t')
     indices = [i for i in range(len(items)) if items[i].startswith('psi')]
     conds = [items[i] for i in indices]
+    n_conds=len(conds)
     for line in lines[1:]:
         # group_id  chrom  start  end  strand  gene_name  psi(Normal)  psi(Tumor)   delta_psi
         items = line.strip().split('\t')
@@ -272,6 +281,10 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
         group_introns_dict[group_id].add(intron)
         intron_info_psis_dict[intron_info] = [items[i] for i in indices]
 
+    if_group_data=False
+    if os.path.isfile(data_dir/'group_data.txt'):
+        if_group_data=True
+
     file = data_dir / 'intron_data.txt'
     with open(file, 'r') as f:
         lines = f.readlines()
@@ -282,7 +295,26 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
         items = line.strip().split('\t')
         _chr, start, end, strand = items[:4]
         intron = f'{_chr}:{start}-{end}'
-        intron_counts_dict[intron] = ','.join(items[6:])
+        if if_group_data:
+            intron_counts_dict[intron] = ','.join(items[6:6+n_conds])
+        else:
+            intron_counts_dict[intron] = ','.join(items[6:])
+
+    if if_group_data:
+        group_data_df=pd.read_csv(data_dir/'group_data.txt',sep='\t')
+        index=[]
+        psis_list=[]
+        for i,r in group_data_df.iterrows():
+            index.append(f'{r[0]}_{r[1]}:{r[2]}-{r[3]}')
+            group_psi=[]
+            for j in range(9,group_data_df.shape[1]):
+                psi_list=r[j].split(',')
+                group_psi.extend(psi_list)
+            psis_list.append(group_psi)
+        psis_df=pd.DataFrame(psis_list,index).round(decimals=6)
+        n_sample=psis_df.shape[1]
+
+        intron_info_dict_est=intron_info_dict.copy()
 
     for group_id, introns in group_introns_dict.items():
         sums = custom_sum(introns, intron_counts_dict)
@@ -290,15 +322,19 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
             intron_info = f'{intron}:{group_id}'
             intron_info_dict[intron_info] += f"\t{intron_counts_dict[intron]}\t.\t{custom_divide(intron_counts_dict[intron], sums)}\t"
             intron_info_dict[intron_info] += '\t'.join(intron_info_psis_dict[intron_info])
+            if if_group_data:
+                try:
+                    intron_info_dict_est[intron_info] += f"\t{intron_counts_dict[intron]}\t.\t{','.join(psis_df.loc[group_id+'_'+intron].values)}\t"
+                except KeyError:
+                    intron_info_dict_est[intron_info] += f"\t{intron_counts_dict[intron]}\t.\t{','.join(['nan']*n_sample)}\t"
+                intron_info_dict_est[intron_info] += '\t'.join(intron_info_psis_dict[intron_info])
 
+
+    header='# mntjulip DSR\n'
     out_buffer = 'GeneName\tGroupID\tFeatureID\tFeatureType\tFeatureLabel\tstrand\tp-value\tq-value\tdPSI\tReadCount1\tReadCount2\tPSI\t' + '\t'.join(conds)
-    file = out_dir / 'mntjulip_DSR_results.tsv'
-    with open(file, 'w') as f:
-        f.write('# mntjulip DSR\n')
-        f.write(out_buffer + '\n')
-        for info in intron_info_dict.values():
-            f.write(info + '\n')
-
+    write_mntjulip_results(out_dir/'mntjulip_DSR_results_raw.tsv', header, out_buffer, intron_info_dict)
+    if if_group_data:
+        write_mntjulip_results(out_dir/'mntjulip_DSR_results.tsv', header, out_buffer, intron_info_dict_est)
 
 def convert_mntjulip_DSA_results(data_dir, out_dir):
     def max_fold_change(items, indices):
@@ -315,6 +351,7 @@ def convert_mntjulip_DSA_results(data_dir, out_dir):
                     max_fold_change = abs(fold_change)
         return max_fold_change
 
+
     file = data_dir / 'diff_introns.txt'
     with open(file, 'r') as f:
         lines = f.readlines()
@@ -324,6 +361,7 @@ def convert_mntjulip_DSA_results(data_dir, out_dir):
     items = lines[0].strip().split('\t')
     indices = [i for i in range(len(items)) if items[i].startswith('avg')]
     conds = [items[i] for i in indices]
+    n_conds=len(conds)
     i = 1
     for line in lines[1:]:
         # chrom start end strand gene_name status  llr     p_value q_value avg_read_counts(case)   avg_read_counts(control)
@@ -340,20 +378,35 @@ def convert_mntjulip_DSA_results(data_dir, out_dir):
     with open(file, 'r') as f:
         lines = f.readlines()
 
-    intron_counts_dict = {}
+    if_est_count=False
+    if len(lines[0].split('\t'))>6+n_conds:
+        if_est_count=True
+        n_sample_by_cond=[]
+        intron_info_dict_est=intron_info_dict.copy()
+        for count_str in lines[1].split('\t')[-n_conds:]:
+            n_sample_by_cond.append(len(count_str.split(',')))
+
     for line in lines[1:]:
         # chrom  start end  strand  gene_name  status  read_counts(Normal) read_counts(Tumor)
         items = line.strip().split('\t')
         _chr, start, end, strand = items[:4]
         intron = f'{_chr}:{start}-{end}'
         if (intron, strand) in intron_info_dict:
-            intron_info_dict[(intron, strand)] += ','.join(items[6:]) + '\t.\t.\t'
+            intron_info_dict[(intron, strand)] += ','.join(items[6:6+n_conds]) + '\t.\t.\t'
             intron_info_dict[(intron, strand)] += '\t'.join(intron_means_dict[(intron, strand)])
+            if if_est_count:
+                est_count_strs=items[6+n_conds:]
+                intron_info_dict_est[(intron, strand)] += ','.join(est_count_strs) + '\t.\t.\t'
+                means=[]
+                for i in range(n_conds):
+                    if 'None' in est_count_strs[i]:
+                        means.append('None')
+                    else:
+                        means.append(str(np.around(sum([float(count_str) for count_str in est_count_strs[i].split(',')])/n_sample_by_cond[i],6)))
+                intron_info_dict_est[(intron, strand)] += '\t'.join(means)
 
-    out_buffer = f'GeneName\tGroupID\tFeatureID\tFeatureType\tFeatureLabel\tstrand\tp-value\tq-value\tlog2FoldChange\tReadCount1\tReadCount2\tPSI\t' + '\t'.join(conds)
-    file = out_dir / 'mntjulip_DSA_results.tsv'
-    with open(file, 'w') as f:
-        f.write('# mntjulip DSA\n')
-        f.write(out_buffer + '\n')
-        for info in intron_info_dict.values():
-            f.write(info + '\n')
+    header='# mntjulip DSA\n'
+    out_buffer=f'GeneName\tGroupID\tFeatureID\tFeatureType\tFeatureLabel\tstrand\tp-value\tq-value\tlog2FoldChange\tReadCount1\tReadCount2\tPSI\t' + '\t'.join(conds)
+    write_mntjulip_results(out_dir/'mntjulip_DSA_results_raw.tsv', header, out_buffer, intron_info_dict)
+    if if_est_count:
+        write_mntjulip_results(out_dir/'mntjulip_DSA_results.tsv', header, out_buffer, intron_info_dict_est)

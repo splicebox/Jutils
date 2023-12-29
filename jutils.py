@@ -3,7 +3,7 @@ import sys, argparse, textwrap
 
 from convert_results_utils import convert_leafcutter_results, convert_rmats_results, convert_mntjulip_results, convert_majiq_results
 from venn_diagram_utils import plot_venn_diagram
-from heatmap_utils import plot_heatmap
+from heatmap_pca_utils import plot_heatmap_pca
 from sashimi_utils import sashimi_plot_with_bams, sashimi_plot_without_bams
 
 
@@ -50,6 +50,25 @@ def get_arguments():
                         help="distance metric for clustering. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule' (default 'cityblock')")
     h_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure(s) in .pdf format')
     h_parser.add_argument('--gene-list-file', type=str, default='', help='list of target genes (one gene per line without space) for heatmap')
+
+    p_parser = subparser.add_parser('pca', help='')
+    parser_dict['pca'] = p_parser
+    p_parser.add_argument('--tsv-file', type=str, help='a TSV file that contains the extracted results')
+    p_parser.add_argument('--meta-file', type=str, help='a TAB separated file that contains the sample name and conditions')
+    p_parser.add_argument('--p-value', type=float, default=0.05, help='cutoff for differential test p-value (default 0.05)')
+    p_parser.add_argument('--q-value', type=float, default=1.0, help='cutoff for differential test q-value (default 1.0)')
+    p_parser.add_argument('--dpsi', type=float, default=0.05, help='cutoff for delta PSI (Percent Splice In) (default 0.05)')
+    p_parser.add_argument('--avg', type=float, default=0., help='cutoff for estimated read counts of DSA results (default 0.0)')
+    p_parser.add_argument('--fold-change', type=float, default=0., help='cutoff for log2(fold-change) of DSA results (default 0.0)')
+    p_parser.add_argument('--aggregate', action='store_true', default=False, help='show results at group level (one entry per group)')
+    p_parser.add_argument('--unsupervised', action='store_true', default=False, help='show results in an unsupervised way')
+    p_parser.add_argument('--out-dir', type=str, default='./out', help='specify the output directory')
+    p_parser.add_argument('--prefix', type=str, default='', help='add prefix to the output file')
+    p_parser.add_argument('--top', type=int, default=100, help='number of top most variable features to display, this option only works in the unsupervised mode (default 100)')
+    p_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure(s) in .pdf format')
+    p_parser.add_argument('--gene-list-file', type=str, default='', help='list of target genes (one gene per line without space) for heatmap')
+    p_parser.add_argument('--color-shape-col', type=str, default='2,3', help='Colour and shape points by the 2 column indices in the meta file. The sample name column starts with index 1 (default: 2,3)')
+    p_parser.add_argument('--label-point', action='store_true', default=False, help='label points with sample names from the meta file')
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
@@ -105,10 +124,18 @@ def run_heatmap_module(args, parser_dict):
         # raise Exception('Please provide the list file that contains the path of the TSV result files!')
         parser_dict['heatmap'].print_help(sys.stderr)
     else:
-        plot_heatmap(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
+        plot_heatmap_pca(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
                  args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
-                 args.aggregate, args.method, args.metric, args.prefix, args.top, args.pdf, args.gene_list_file)
+                 args.aggregate, args.prefix, args.top, args.pdf, args.gene_list_file, plot_type='heatmap', method=args.method, metric=args.metric)
 
+def run_pca_module(args, parser_dict):
+    if not args.tsv_file or not args.meta_file:
+        # raise Exception('Please provide the list file that contains the path of the TSV result files!')
+        parser_dict['pca'].print_help(sys.stderr)
+    else:
+        plot_heatmap_pca(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
+                 args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
+                 args.aggregate, args.prefix, args.top, args.pdf, args.gene_list_file, plot_type='pca', color_shape_col=args.color_shape_col, label_point=args.label_point)
 
 def run_sashimi_module(args, parser_dict):
     if args.bam_list:
@@ -140,6 +167,9 @@ def main():
 
     if args.command == 'heatmap':
         run_heatmap_module(args, parser_dict)
+
+    if args.command == 'pca':
+        run_pca_module(args, parser_dict)
 
     if args.command == 'sashimi':
         run_sashimi_module(args, parser_dict)

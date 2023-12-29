@@ -99,6 +99,28 @@ Lastly, users can create high resolution PDF images with the option `--pdf`; by 
 `--method` and `--metric` are two options for hierarchical clustering, See [scipy.cluster.hierarchy.linkage](https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html#scipy.cluster.hierarchy.linkage) and [scipy.spatial.distance.pdist](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist) for more information.
 --->
 
+_PCA visualization_
+```
+python3 jutils.py pca --tsv-file <tsv_file> --meta-file <meta_file> [options]
+        options:
+        --dpsi         cutoff for delta PSI (Percent Splice In) (default 0.05)
+        --p-value      cutoff for differential test p-value (default 0.05)
+        --q-value      cutoff for differential test q-value (default 1.0)
+        --aggregate    show results at group level (one entry per group)
+        --avg          cutoff for estimated read counts of DSA results (default 0.0)
+        --fold-change  cutoff for log2(fold-change) of DSA results (default 0.0)
+        --unsupervised display the top most variable features
+        --top          number of top most variable features to display, this option only works in the unsupervised mode (default 100)
+        --prefix       add prefix to the output file name
+        --out-dir      specify the output directory
+        --pdf          generate figures in PDF format (default PNG)
+        --gene-list-file list of target genes (one gene per line without space) for heatmap
+        --color-shape-col Colour and shape points by the 2 column indices in the meta file. The sample name column starts with index 1 (default: 2,3)
+        --label-point  label points with sample names from the meta file
+```
+
+The command generates PCA plots of PC1-2, PC1-3, and PC2-3. The option `--color-shape-col` can change the colours and shapes of points by specific columns. By default (2,3), the condition column specifies the colours and the third optional covariate column specifies the shapes. The option `--label-point` annotates sample names from the meta file to the points.
+
 _Sashimi visualization_
 ```
 python3 jutils.py sashimi --tsv-file <tsv_file> --meta-file <meta_file> --gtf <gtf_file> [ --group-id <group_id> | --coordinate <coords> ] [options]
