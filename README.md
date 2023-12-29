@@ -4,13 +4,12 @@ Jutils (version 1.0) is a visualization toolkit for alternative splicing events.
 
 Described in:
 
-   Yang G, Cope L, He Z, and Florea L. (2021) Jutils: A visualization toolkit for differential alternative splicing events, *Bioinformatics* [37(22):4272–4274](https://doi.org/10.1093/bioinformatics/btab401).
+   - Yang G, Cope L, He Z, and Florea L (2021). Jutils: A visualization toolkit for differential alternative splicing events, *Bioinformatics* [37(22):4272–4274](https://doi.org/10.1093/bioinformatics/btab401). [[scripts](https://github.com/splicebox/Jutils/blob/master/data/test_jutils.sh), [data](https://github.com/splicebox/Jutils/tree/master/data)]
+   - Lui WW, Yang G, and Florea L (2023). MntJULiP and Jutils: Differential splicing analysis of RNA-seq data with covariates. *Submitted*.
 
-Supplementary [scripts](https://github.com/splicebox/Jutils/blob/master/data/test_jutils.sh) and data described in the article can be found in the '[data](https://github.com/splicebox/Jutils/tree/master/data)' directory.
-
-
+This branch contains the working version of Jutils, which implements PCA visualizations. For the original (stable) version of Jutils, please refer to the [master](https://github.com/splicebox/Jutils/tree/master) branch.
 ```
-Copyright (C) 2020-2023, and GNU GPL v3.0, by Guangyu Yang, Wui Wang Lui, Liliana Florea
+Copyright (C) 2020-2024, and GNU GPL v3.0, by †Guangyu Yang, †Wui Wang Lui, Liliana Florea  († equal contributors)
 ```
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.  
