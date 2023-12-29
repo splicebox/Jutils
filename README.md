@@ -8,6 +8,8 @@ Described in:
 
 Supplementary [scripts](https://github.com/splicebox/Jutils/blob/master/data/test_jutils.sh) and data described in the article can be found in the '[data](https://github.com/splicebox/Jutils/tree/master/data)' directory.
 
+This branch contains the original (stable) version of Jutils. For the working version, which implements PCA visualizations, please refer to the [pca](https://github.com/splicebox/Jutils/tree/pca) branch.
+
 
 ```
 Copyright (C) 2020-2023, and GNU GPL v3.0, by Guangyu Yang, Wui Wang Lui, Liliana Florea
