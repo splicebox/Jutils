@@ -9,7 +9,7 @@ Described in:
 
 This branch contains the working version of Jutils, version 1.5, which additionally implements PCA visualizations. For the original (stable) version of Jutils, please refer to the [master](https://github.com/splicebox/Jutils/tree/master) branch.
 ```
-Copyright (C) 2020-2024, and GNU GPL v3.0, by †Guangyu Yang, †Wui Wang Lui, Liliana Florea  († equal contributors)
+Copyright (C) 2020-2024, and GNU GPL v3.0, by †Wui Wang Lui, †Guangyu Yang, Liliana Florea  († equal contributors)
 ```
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.  
