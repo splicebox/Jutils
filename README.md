@@ -115,7 +115,7 @@ python3 jutils.py pca --tsv-file <tsv_file> --meta-file <meta_file> [options]
         --out-dir      specify the output directory
         --pdf          generate figures in PDF format (default PNG)
         --gene-list-file list of target genes (one gene per line without space) for heatmap
-        --color-shape-col Colour and shape points by the 2 column indices in the meta file. The sample name column starts with index 1 (default: 2,3)
+        --color-shape-col select 2 column indices in the meta file to colour and shape points. The sample name column starts with index 1 (default: 2,3)
         --label-point  label points with sample names from the meta file
 ```
 

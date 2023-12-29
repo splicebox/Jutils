@@ -67,7 +67,7 @@ def get_arguments():
     p_parser.add_argument('--top', type=int, default=100, help='number of top most variable features to display, this option only works in the unsupervised mode (default 100)')
     p_parser.add_argument('--pdf', action='store_true', default=False, help='generate figure(s) in .pdf format')
     p_parser.add_argument('--gene-list-file', type=str, default='', help='list of target genes (one gene per line without space) for heatmap')
-    p_parser.add_argument('--color-shape-col', type=str, default='2,3', help='Colour and shape points by the 2 column indices in the meta file. The sample name column starts with index 1 (default: 2,3)')
+    p_parser.add_argument('--color-shape-col', type=str, default='2,3', help='select 2 column indices in the meta file to colour and shape points. The sample name column starts with index 1 (default: 2,3)')
     p_parser.add_argument('--label-point', action='store_true', default=False, help='label points with sample names from the meta file')
 
     s_parser = subparser.add_parser('sashimi', help='')
