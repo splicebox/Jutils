@@ -52,7 +52,7 @@ def parse_gene_list(gene_list_file):
 
 def plot_heatmap_pca(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
                  dpsi_threshold, foldchange_threshold, avg_threshold,
-                 unsupervised, aggregate, prefix, top, pdf, gene_list_file, plot_type, method=None, metric=None, color_shape_col=None, label_point=None):
+                 unsupervised, aggregate, prefix, top, pdf, gene_list_file, plot_type, method=None, metric=None, color_shape_col=None, label_point=None, filter_name_list=''):
     check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold)
 
     samples = []
@@ -79,9 +79,9 @@ def plot_heatmap_pca(file, meta_file, out_dir, p_value_threshold, q_value_thresh
     print_warning(original_columns, p_value_threshold, q_value_threshold, dpsi_threshold, foldchange_threshold,
                   avg_threshold, unsupervised, aggregate, top)
 
-    if plot_type=='pca' and 'log2FoldChange' in original_columns:
-        for col in ['ReadCount1'] + data_df.columns[-len(set(conditions)):].to_list():
-            data_df[col]=data_df[col].str.replace('None','0')
+    #if plot_type=='pca' and 'log2FoldChange' in original_columns:
+    #    for col in ['ReadCount1'] + data_df.columns[-len(set(conditions)):].to_list():
+    #        data_df[col]=data_df[col].str.replace('None','0')
 
     if unsupervised:
         data_df = process_data_unsupervised(data_df, samples, original_columns, avg_threshold, aggregate, top)
@@ -93,7 +93,7 @@ def plot_heatmap_pca(file, meta_file, out_dir, p_value_threshold, q_value_thresh
         generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
                           method, metric, prefix, aggregate, unsupervised, out_dir, pdf)
     elif plot_type=='pca':
-        generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, color_shape_col, label_point)
+        generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, color_shape_col, label_point, filter_name_list)
 
 
 def truncate_gene_name(string):
@@ -329,9 +329,17 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     figure.savefig(out_dir / '_'.join(filter(None, strings + [f'clustermap_Z.{format}'])))
     plt.close()
 
+
     figure = sns.clustermap(data_df, cmap="RdBu_r", z_score=0, vmin=-5, vmax=5,
                             metric=metric, method=method, mask=mask,
                             yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight),dendrogram_ratio=(0.2,dendrogram_height_ratio),cbar_pos=(0.02, 1-dendrogram_height_ratio, .02, .03), **clustermapParams)
+    #from scipy.cluster.hierarchy import linkage
+    #link = linkage(data_df.T)
+    #link[-1][[0, 1]] = link[-1][[1, 0]]
+    #import pdb;pdb.set_trace()
+    #figure = sns.clustermap(data_df, cmap="RdBu_r", col_linkage=link, z_score=0, vmin=-5, vmax=5,
+    #                        metric=metric, method=method, mask=mask,
+    #                        yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight),dendrogram_ratio=(0.2,dendrogram_height_ratio),cbar_pos=(0.02, 1-dendrogram_height_ratio, .02, .03), **clustermapParams)
 
     figure.ax_heatmap.set_facecolor("lightyellow")
     set_xtick_text_colors(figure, sample_cond_dict, conditions)
@@ -360,42 +368,31 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
         figure.savefig(out_dir / '_'.join(filter(None, strings + [f'clustermap2.{format}'])))
         plt.close()
 
-def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, color_shape_col, label_point):
+def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, color_shape_col, label_point, filter_name_list):
 
     from sklearn.decomposition import PCA
     import matplotlib
+    import itertools
 
-    def categorical_cmap(nc, nsc, cmap="tab10", continuous=False):
-        if nc > plt.get_cmap(cmap).N:
-            raise ValueError("Too many categories for colormap.")
-        if continuous:
-            ccolors = plt.get_cmap(cmap)(np.linspace(0,1,nc))
-        else:
-            ccolors = plt.get_cmap(cmap)(np.arange(nc, dtype=int))
-        cols = np.zeros((nc*nsc, 3))
-        for i, c in enumerate(ccolors):
-            chsv = matplotlib.colors.rgb_to_hsv(c[:3])
-            arhsv = np.tile(chsv,nsc).reshape(nsc,3)
-            arhsv[:,1] = np.linspace(chsv[1],0.25,nsc)
-            arhsv[:,2] = np.linspace(chsv[2],1,nsc)
-            rgb = matplotlib.colors.hsv_to_rgb(arhsv)
-            cols[i*nsc:(i+1)*nsc,:] = rgb
-        cmap = matplotlib.colors.ListedColormap(cols)
-        return cmap
 
     condition_col_index,group_col_index=color_shape_col.split(',')
     meta_df=pd.read_csv(meta_file,sep='\t',header=None)
     #  sort condition col
     condition_col_index=int(condition_col_index)-2
+    
+
     meta_df=meta_df.sort_values([condition_col_index+1])
+
+    meta_col_n=meta_df.shape[1]
+
     label_df=meta_df.iloc[:,1:]
-    labels_unique = label_df.drop_duplicates()
+    labels_unique = label_df.drop_duplicates().sort_values([col for col in label_df.columns])
     targets = labels_unique.values
 
 
     conditions=labels_unique.iloc[:,condition_col_index]
     conditions_unique=conditions.unique()
-    meta_col_n=meta_df.shape[1]
+
     if meta_col_n>2:
         group_col_index=int(group_col_index)-2
         groups_unique=labels_unique.iloc[:,group_col_index].unique()
@@ -406,46 +403,87 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
     n_targets = len(targets)
 
     anno_text_len=20
+    marker_size=50
 
     if 'dPSI' in original_columns:
         data_df=data_df.dropna()
-        title='DSR'
+        #title='DSR'
     elif 'log2FoldChange' in original_columns:
         data_df=data_df.fillna(0)
-        title='DSA'
+        #title='DSA'
 
     pca = PCA(n_components=3)
-    principalComponents = pca.fit_transform(data_df.T)
-    principalDf = pd.DataFrame(data = principalComponents, columns = ['PC 1', 'PC 2', 'PC 3'])
-    finalDf = pd.concat([principalDf, meta_df], axis = 1)
+    principalComponents = pca.fit_transform(data_df.T.iloc[meta_df.index])
+    principalDf = pd.DataFrame(data = principalComponents, columns = ['PC1', 'PC2', 'PC3'])
+    meta_df_reset_index=meta_df.reset_index()
+    if filter_name_list:
+        filter_name_list_df=pd.read_csv(filter_name_list,header=None)
+        filter_name_list_reset_index= meta_df_reset_index.index[ meta_df_reset_index[0].isin(filter_name_list_df[0]) ]
+    finalDf = pd.concat([principalDf, meta_df_reset_index.drop(['index'],axis=1)], axis = 1)
+    
+
+
     for x,y in [(1,2),(1,3),(2,3)]:
         fig = plt.figure(figsize = (8,8))
         ax = fig.add_subplot(1,1,1)
-        ax.set_xlabel(f'PC {x}', fontsize = 15)
-        ax.set_ylabel(f'PC {y}', fontsize = 15)
-        ax.set_title(f'{title} 2-component PCA', fontsize = 20)
+        ax.set_xlabel(f'PC{x}', fontsize = 20)
+        ax.set_ylabel(f'PC{y}', fontsize = 20)
+        ax.set_title(f'PCA', fontsize = 25)
 
-        colors=categorical_cmap(n_conditions, conditions.value_counts().max(), cmap="tab10").colors
+        colors=sns.color_palette("tab10")
+        cond_sorted_rev=sorted(conditions_unique,reverse=True)
+
+        color_dict=dict()
+        for i in range(n_conditions):
+            color_dict[cond_sorted_rev[i]]=colors[i]
+
 
         if meta_col_n>2:
             markers=dict()
-            for i in range(1, n_groups+1):
-                markers[groups_unique[i-1]]=(2+i, 1+i%2, i/n_targets*90.0)
+            selected_markers=['v','.','s','P','X','D']
+            generated_markers=[(2+i, 1+i%2, i/n_targets*90.0) for i in range(1, n_groups+1-len(selected_markers))]
+            markers_cycle = itertools.cycle(selected_markers + generated_markers)
+            for i in range(n_groups):
+                markers[groups_unique[i]]=next(markers_cycle)
 
         for i in range(n_targets):
             indicesToKeep = (finalDf.iloc[:,4:] == targets[i]).sum(axis=1) == meta_col_n-1
-            x_pos=finalDf.loc[indicesToKeep, f'PC {x}']
-            y_pos=finalDf.loc[indicesToKeep, f'PC {y}']
+            if filter_name_list:
+                indicesToKeep.iloc[filter_name_list_reset_index] = False
+            x_pos=finalDf.loc[indicesToKeep, f'PC{x}']
+            y_pos=finalDf.loc[indicesToKeep, f'PC{y}']
             if meta_col_n>2:
-                ax.scatter(x_pos, y_pos, color=colors[i], marker=markers[targets[i][group_col_index]],s = 100)
+                marker=markers[targets[i][group_col_index]]
+                if marker=='v':
+                    ax.scatter(x_pos, y_pos, color=color_dict[targets[i][condition_col_index]], marker=marker,s = marker_size/2)
+                else:
+                    ax.scatter(x_pos, y_pos, color=color_dict[targets[i][condition_col_index]], marker=marker,s = marker_size)
             else:
-                ax.scatter(x_pos, y_pos, color=colors[i],s = 50)
+                ax.scatter(x_pos, y_pos, color=color_dict[targets[i][condition_col_index]],s = marker_size)
             if label_point==True:
-                for j,row in finalDf.loc[indicesToKeep, [f'PC {x}',f'PC {y}',0]].iterrows():
-                    ax.annotate(row[0][:anno_text_len],(row[f'PC {x}'], row[f'PC {y}']))
+                for j,row in finalDf.loc[indicesToKeep, [f'PC{x}',f'PC{y}',0]].iterrows():
+                    ax.annotate(row[0][:anno_text_len],(row[f'PC{x}'], row[f'PC{y}']))
+
+        if filter_name_list:
+            filter_color='tab:cyan'
+            filter_marker_size=125
+            for index in filter_name_list_reset_index:
+                x_pos=finalDf.loc[index, f'PC{x}']
+                y_pos=finalDf.loc[index, f'PC{y}']
+                if meta_col_n>2:
+                    marker=markers[finalDf.loc[index,group_col_index+1]]
+                    if marker=='v':
+                        ax.scatter(x_pos, y_pos, color=filter_color, marker=marker,s = filter_marker_size/2)
+                    else:
+                        ax.scatter(x_pos, y_pos, color=filter_color, marker=marker,s = filter_marker_size)
+                else:
+                    ax.scatter(x_pos, y_pos, color=filter_color,s = filter_marker_size)
+
+
         legends=[]
+
         for target in targets:
-            legends.append(' '.join([str(_) for _ in target]))
+            legends.append(','.join([str(_) for _ in target]))
 
         ax.legend(legends)
         ax.grid()
@@ -455,6 +493,8 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
             strings.append('unsupervised')
         if aggregate:
             strings.append('aggregated')
+        if filter_name_list:
+            strings.append('highlighted')
 
         format = 'pdf' if pdf else 'png'
         fig.savefig(out_dir/'_'.join(filter(None, strings + [f'pca.pc{x}-{y}.{format}'])))

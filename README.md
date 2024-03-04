@@ -113,9 +113,10 @@ python3 jutils.py pca --tsv-file <tsv_file> --meta-file <meta_file> [options]
         --prefix       add prefix to the output file name
         --out-dir      specify the output directory
         --pdf          generate figures in PDF format (default PNG)
-        --gene-list-file list of target genes (one gene per line without space) for heatmap
+        --gene-list-file list of target gene(s) (one gene per line without space) for heatmap
         --color-shape-col select 2 column indices in the meta file to colour and shape points respectively. The sample name column starts with index 1 (default 2,3)
         --label-point  label points with sample names from the meta file
+        --highlight-idlist-file  list of highlighted sample(s) (one sample name per line without space) for pca
 ```
 
 The command generates PCA plots of PC1-2, PC1-3, and PC2-3. The option `--color-shape-col` can change the colours and shapes of points by specific columns. By default (2,3), column 2, namely the condition, specifies the colours and column 3, the (optional) covariate column specifies the shapes. The option `--label-point` annotates sample names from the meta file to the points. For details about the filter options, please refer to the section on _heatmaps_ above.
