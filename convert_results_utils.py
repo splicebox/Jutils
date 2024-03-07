@@ -281,9 +281,10 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
         group_introns_dict[group_id].add(intron)
         intron_info_psis_dict[intron_info] = [items[i] for i in indices]
 
-    if_group_data=False
-    if os.path.isfile(data_dir/'group_data.txt'):
-        if_group_data=True
+    if_est_psis=False
+    group_data_df=pd.read_csv(data_dir/'group_data.txt',sep='\t')
+    if group_data_df.shape[1]>7+n_conds:
+        if_est_psis=True
 
     file = data_dir / 'intron_data.txt'
     with open(file, 'r') as f:
@@ -295,13 +296,12 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
         items = line.strip().split('\t')
         _chr, start, end, strand = items[:4]
         intron = f'{_chr}:{start}-{end}'
-        if if_group_data:
+        if if_est_psis:
             intron_counts_dict[intron] = ','.join(items[6:6+n_conds])
         else:
             intron_counts_dict[intron] = ','.join(items[6:])
 
-    if if_group_data:
-        group_data_df=pd.read_csv(data_dir/'group_data.txt',sep='\t')
+    if if_est_psis:
         index=[]
         psis_list=[]
         for i,r in group_data_df.iterrows():
@@ -323,7 +323,7 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
             intron_info = f'{intron}:{group_id}'
             intron_info_dict[intron_info] += f"\t{intron_counts_dict[intron]}\t.\t{custom_divide(intron_counts_dict[intron], sums)}\t"
             intron_info_dict[intron_info] += '\t'.join(intron_info_psis_dict[intron_info])
-            if if_group_data:
+            if if_est_psis:
                 try:
                     intron_info_dict_est[intron_info] += f"\t{intron_counts_dict[intron]}\t.\t{','.join(psis_df.loc[group_id+'_'+intron].values)}\t"
                 except KeyError:
@@ -334,7 +334,7 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
     header='# mntjulip DSR\n'
     out_buffer = 'GeneName\tGroupID\tFeatureID\tFeatureType\tFeatureLabel\tstrand\tp-value\tq-value\tdPSI\tReadCount1\tReadCount2\tPSI\t' + '\t'.join(conds)
     write_mntjulip_results(out_dir/'mntjulip_DSR_results_raw.tsv', header, out_buffer, intron_info_dict)
-    if if_group_data:
+    if if_est_psis:
         write_mntjulip_results(out_dir/'mntjulip_DSR_results.tsv', header, out_buffer, intron_info_dict_est)
 
 def convert_mntjulip_DSA_results(data_dir, out_dir):
