@@ -39,7 +39,7 @@ git clone https://github.com/splicebox/Jutils.git
 * R 4.0 or later
 
 #### Prerequisites
-Required Python packages: `pandas`, `numpy`, `seaborn`, `matplotlib`. The Python packages can be installed with the command:   
+Required Python packages: `pandas`, `numpy`, `seaborn`, `matplotlib`, `scipy`, `scikit-learn`. The Python packages can be installed with the command:   
 ```
 pip install --user pandas numpy seaborn matplotlib
 ```
