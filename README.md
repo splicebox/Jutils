@@ -5,7 +5,7 @@ Jutils (version 1.5) is a visualization toolkit for alternative splicing events.
 Described in:
 
    - Yang G, Cope L, He Z, and Florea L (2021). Jutils: A visualization toolkit for differential alternative splicing events, *Bioinformatics* [37(22):4272–4274](https://doi.org/10.1093/bioinformatics/btab401). [[scripts](https://github.com/splicebox/Jutils/blob/master/data/test_jutils.sh), [data](https://github.com/splicebox/Jutils/tree/master/data)]
-   - Lui WW, Yang G, and Florea L (2023). MntJULiP and Jutils: Differential splicing analysis of RNA-seq data with covariates. *Submitted*.
+   - Lui WW, Yang G, He Z, and Florea L (2024). MntJULiP and Jutils: Differential splicing analysis of RNA-seq data with covariates. *Submitted*. [[Preprint](https://pubmed.ncbi.nlm.nih.gov/38260578/)]
 
 This branch contains the working version of Jutils, version 1.5, which additionally implements PCA visualizations. For the original (stable) version of Jutils, please refer to the [master](https://github.com/splicebox/Jutils/tree/master) branch.
 ```
