@@ -138,10 +138,13 @@ def convert_rmats_results(data_dir, out_dir):
                 lines = f.readlines()
 
             for line in lines[1:]:
-                fid, _, gene_name, _chr, strand, es, ee, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                fid, gene_id, gene_name, _chr, strand, es, ee, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
                 label = f'{_chr}:{uee},{es}-{ee},{des}'
                 p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-                gene_name = gene_name[1:-1]
+                if gene_name!='NA':
+                    gene_name = gene_name[1:-1]
+                else:
+                    gene_name=gene_id[1:-1]
                 out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tSE\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
                 i += 1
 
@@ -151,10 +154,13 @@ def convert_rmats_results(data_dir, out_dir):
                 lines = f.readlines()
 
             for line in lines[1:]:
-                fid, _, gene_name, _chr, strand, _, _, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                fid, gene_id, gene_name, _chr, strand, _, _, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
                 label = f'{_chr}:{ues}-{uee}:{des}-{dee}'
                 p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-                gene_name = gene_name[1:-1]
+                if gene_name!='NA':
+                    gene_name = gene_name[1:-1]
+                else:
+                    gene_name=gene_id[1:-1]
                 out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tRI\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
                 i += 1
 
@@ -164,10 +170,13 @@ def convert_rmats_results(data_dir, out_dir):
                 lines = f.readlines()
 
             for line in lines[1:]:
-                fid, _, gene_name, _chr, strand, es1, ee1, es2, ee2, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                fid, gene_id, gene_name, _chr, strand, es1, ee1, es2, ee2, ues, uee, des, dee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
                 label = f'{_chr}:{uee},{es1}-{ee1}:{es2}-{ee2},{des}'
                 p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-                gene_name = gene_name[1:-1]
+                if gene_name!='NA':
+                    gene_name = gene_name[1:-1]
+                else:
+                    gene_name=gene_id[1:-1]
                 out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tMXE\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
                 i += 1
 
@@ -177,10 +186,13 @@ def convert_rmats_results(data_dir, out_dir):
                 lines = f.readlines()
 
             for line in lines[1:]:
-                fid, _, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                fid, gene_id, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
                 label = f'{_chr}:{les}-{lee}:{ses}-{see},{fes}'
                 p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-                gene_name = gene_name[1:-1]
+                if gene_name!='NA':
+                    gene_name = gene_name[1:-1]
+                else:
+                    gene_name=gene_id[1:-1]
                 out_buffer += f'{gene_name}\tJ{i:05d}\t{fid}\tA5SS\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
                 i += 1
 
@@ -190,10 +202,13 @@ def convert_rmats_results(data_dir, out_dir):
                 lines = f.readlines()
 
             for line in lines[1:]:
-                fid, _, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
+                fid, gene_id, gene_name, _chr, strand, les, lee, ses, see, fes, fee, _, ic1, sc1, ic2, sc2, _, _, p_value, q_value, icl1, icl2, dpsi = line.strip().split('\t')
                 label = f'{_chr}:{fee},{les}-{lee}:{ses}-{see}'
                 p_value, q_value, dpsi = f'{float(p_value):.6g}', f'{float(q_value):.6g}', f'{float(dpsi):.6g}'
-                gene_name = gene_name[1:-1]
+                if gene_name!='NA':
+                    gene_name = gene_name[1:-1]
+                else:
+                    gene_name=gene_id[1:-1]
                 out_buffer += f'{gene_name}\tJ{i:06d}\t{fid}\tA3SS\t{label}\t{strand}\t{p_value}\t{q_value}\t{dpsi}\t{ic1},{ic2}\t{sc1},{sc2}\t{icl1},{icl2}\t.\t.\n'
                 i += 1
 
@@ -282,9 +297,11 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
         intron_info_psis_dict[intron_info] = [items[i] for i in indices]
 
     if_est_psis=False
-    group_data_df=pd.read_csv(data_dir/'group_data.txt',sep='\t')
-    if group_data_df.shape[1]>7+n_conds:
-        if_est_psis=True
+    file = data_dir / 'group_data.txt'
+    if file.exists():
+        group_data_df=pd.read_csv(file,sep='\t')
+        if group_data_df.shape[1]>7+n_conds:
+            if_est_psis=True
 
     file = data_dir / 'intron_data.txt'
     with open(file, 'r') as f:
@@ -390,21 +407,22 @@ def convert_mntjulip_DSA_results(data_dir, out_dir):
     for line in lines[1:]:
         # chrom  start end  strand  gene_name  status  read_counts(Normal) read_counts(Tumor)
         items = line.strip().split('\t')
-        _chr, start, end, strand = items[:4]
-        intron = f'{_chr}:{start}-{end}'
-        if (intron, strand) in intron_info_dict:
-            intron_info_dict[(intron, strand)] += ','.join(items[6:6+n_conds]) + '\t.\t.\t'
-            intron_info_dict[(intron, strand)] += '\t'.join(intron_means_dict[(intron, strand)])
-            if if_est_count:
-                est_count_strs=items[6+n_conds:]
-                intron_info_dict_est[(intron, strand)] += ','.join(est_count_strs) + '\t.\t.\t'
-                means=[]
-                for i in range(n_conds):
-                    if 'None' in est_count_strs[i]:
-                        means.append('None')
-                    else:
-                        means.append(str(np.around(sum([float(count_str) for count_str in est_count_strs[i].split(',')])/n_sample_by_cond[i],6)))
-                intron_info_dict_est[(intron, strand)] += '\t'.join(means)
+        _chr, start, end, strand, _ , status = items[:6]
+        if status == 'OK':
+            intron = f'{_chr}:{start}-{end}'
+            if (intron, strand) in intron_info_dict:
+                intron_info_dict[(intron, strand)] += ','.join(items[6:6+n_conds]) + '\t.\t.\t'
+                intron_info_dict[(intron, strand)] += '\t'.join(intron_means_dict[(intron, strand)])
+                if if_est_count:
+                    est_count_strs=items[6+n_conds:]
+                    intron_info_dict_est[(intron, strand)] += ','.join(est_count_strs) + '\t.\t.\t'
+                    means=[]
+                    for i in range(n_conds):
+                        if 'None' in est_count_strs[i]:
+                            means.append('None')
+                        else:
+                            means.append(str(np.around(sum([float(count_str) for count_str in est_count_strs[i].split(',')])/n_sample_by_cond[i],6)))
+                    intron_info_dict_est[(intron, strand)] += '\t'.join(means)
 
     header='# mntjulip DSA\n'
     out_buffer=f'GeneName\tGroupID\tFeatureID\tFeatureType\tFeatureLabel\tstrand\tp-value\tq-value\tlog2FoldChange\tReadCount1\tReadCount2\tPSI\t' + '\t'.join(conds)

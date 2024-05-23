@@ -121,6 +121,12 @@ python3 jutils.py pca --tsv-file <tsv_file> --meta-file <meta_file> [options]
 
 The command generates PCA plots of PC1-2, PC1-3, and PC2-3. The option `--color-shape-col` can change the colours and shapes of points by specific columns. By default (2,3), column 2, namely the condition, specifies the colours and column 3, the (optional) covariate column specifies the shapes. The option `--label-point` annotates sample names from the meta file to the points. For details about the filter options, please refer to the section on _heatmaps_ above.
 
+Test run pca with test data:
+```
+cd data/mntjulip.jutils_testdata/
+python ../../jutils.py pca --meta-file splice.4F1M.cov.meta --tsv-file mntjulip_DSR_results.tsv
+```
+
 _Sashimi visualization_
 ```
 python3 jutils.py sashimi --tsv-file <tsv_file> --meta-file <meta_file> --gtf <gtf_file> [ --group-id <group_id> | --coordinate <coords> ] [options]
