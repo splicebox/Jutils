@@ -39,9 +39,9 @@ git clone https://github.com/splicebox/Jutils.git
 * R 4.0 or later
 
 #### Prerequisites
-Required Python packages: `pandas`, `numpy`, `seaborn`, `matplotlib`, `scipy`, `scikit-learn`. The Python packages can be installed with the command:   
+Required Python packages: `pandas`, `numpy`, `seaborn`, `matplotlib`, `scikit-learn`. The Python packages can be installed with the command:   
 ```
-pip install --user pandas numpy seaborn matplotlib
+pip install --user pandas numpy seaborn matplotlib scikit-learn
 ```
 
 Required R packages: `ggplot2`, `gridExtra`, `data.table`. The R packages can be installed with the command in R console:   
