@@ -102,7 +102,7 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
         intersected_introns = list(intersect_introns(introns))
 
     # *** PLOT *** Define plot height
-    height, width, base_size = 3 * len(overlay_dict), 10, 14
+    height, width, base_size = 3 * len(overlay_dict)+1, 10, 14
 
     # *** PLOT *** Start R script by loading libraries, initializing variables, etc...
     R_script = setup_R_script(height, width, base_size, label_dict)
