@@ -93,7 +93,7 @@ def plot_heatmap_pca(file, meta_file, out_dir, p_value_threshold, q_value_thresh
         generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
                           method, metric, prefix, aggregate, unsupervised, out_dir, pdf)
     elif plot_type=='pca':
-        generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, color_shape_col, label_point, filter_name_list)
+        generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, metric, color_shape_col, label_point, filter_name_list)
 
 
 def truncate_gene_name(string):
@@ -368,11 +368,17 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
         figure.savefig(out_dir / '_'.join(filter(None, strings + [f'clustermap2.{format}'])))
         plt.close()
 
-def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, color_shape_col, label_point, filter_name_list):
+def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupervised, out_dir, pdf, metric, color_shape_col, label_point, filter_name_list):
 
     from sklearn.decomposition import PCA
+    from sklearn.manifold import MDS
+    from scipy.spatial.distance import pdist, squareform
     import matplotlib
     import itertools
+
+    # Default to euclidean if metric is None
+    if metric is None:
+        metric = 'euclidean'
 
 
     condition_col_index,group_col_index=color_shape_col.split(',')
@@ -412,8 +418,25 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
         data_df=data_df.fillna(0)
         #title='DSA'
 
-    pca = PCA(n_components=3)
-    principalComponents = pca.fit_transform(data_df.T.iloc[meta_df.index])
+    # Prepare data for analysis
+    data_for_analysis = data_df.T.iloc[meta_df.index]
+    
+    # Use PCA for euclidean distance, MDS for other distance metrics
+    if metric == 'euclidean':
+        # Standard PCA
+        pca = PCA(n_components=3)
+        principalComponents = pca.fit_transform(data_for_analysis)
+        method_name = 'PCA'
+    else:
+        # Use MDS with specified distance metric
+        # Calculate distance matrix
+        distance_matrix = squareform(pdist(data_for_analysis, metric=metric))
+        
+        # Perform MDS
+        mds = MDS(n_components=3, dissimilarity='precomputed', random_state=42)
+        principalComponents = mds.fit_transform(distance_matrix)
+        method_name = f'MDS-{metric}'
+    
     principalDf = pd.DataFrame(data = principalComponents, columns = ['PC1', 'PC2', 'PC3'])
     meta_df_reset_index=meta_df.reset_index()
     if filter_name_list:
@@ -428,7 +451,7 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
         ax = fig.add_subplot(1,1,1)
         ax.set_xlabel(f'PC{x}', fontsize = 20)
         ax.set_ylabel(f'PC{y}', fontsize = 20)
-        ax.set_title(f'PCA', fontsize = 25)
+        ax.set_title(f'{method_name}', fontsize = 25)
 
         colors=sns.color_palette("tab10")
         cond_sorted_rev=sorted(conditions_unique,reverse=True)
@@ -495,9 +518,12 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
             strings.append('aggregated')
         if filter_name_list:
             strings.append('highlighted')
+        
+        # Add metric to filename if not euclidean
+        method_suffix = 'pca' if metric == 'euclidean' else f'mds-{metric}'
 
         format = 'pdf' if pdf else 'png'
-        fig.savefig(out_dir/'_'.join(filter(None, strings + [f'pca.pc{x}-{y}.{format}'])))
+        fig.savefig(out_dir/'_'.join(filter(None, strings + [f'{method_suffix}.pc{x}-{y}.{format}'])))
 
 
 def get_preset_palette():
