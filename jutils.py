@@ -70,6 +70,8 @@ def get_arguments():
     p_parser.add_argument('--color-shape-col', type=str, default='2,3', help='select 2 column indices in the meta file to colour and shape points respectively. The sample name column starts with index 1 (default 2,3)')
     p_parser.add_argument('--label-point', action='store_true', default=False, help='label points with sample names from the meta file')
     p_parser.add_argument('--highlight-idlist-file', type=str, default='', help='list of highlighted sample(s) (one sample name per line without space) for pca')
+    p_parser.add_argument('--metric', type=str, default='euclidean',
+                        help="distance metric for analysis. The distance function can be 'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'jensenshannon', 'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'. When 'euclidean' is used, standard PCA is performed. For other metrics, Multidimensional Scaling (MDS) is used. (default 'euclidean')")
 
     s_parser = subparser.add_parser('sashimi', help='')
     parser_dict['sashimi'] = s_parser
@@ -136,7 +138,7 @@ def run_pca_module(args, parser_dict):
     else:
         plot_heatmap_pca(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
                  args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
-                 args.aggregate, args.prefix, args.top, args.pdf, args.gene_list_file, plot_type='pca', color_shape_col=args.color_shape_col, label_point=args.label_point, filter_name_list=args.highlight_idlist_file)
+                 args.aggregate, args.prefix, args.top, args.pdf, args.gene_list_file, plot_type='pca', metric=args.metric, color_shape_col=args.color_shape_col, label_point=args.label_point, filter_name_list=args.highlight_idlist_file)
 
 def run_sashimi_module(args, parser_dict):
     if args.bam_list:
