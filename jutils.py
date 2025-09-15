@@ -3,7 +3,7 @@ import sys, argparse, textwrap
 
 from convert_results_utils import convert_leafcutter_results, convert_rmats_results, convert_mntjulip_results, convert_majiq_results
 from venn_diagram_utils import plot_venn_diagram
-from heatmap_pca_utils import plot_heatmap_pca
+from heatmap_pca_mds_utils import plot_heatmap_pca_mds
 from sashimi_utils import sashimi_plot_with_bams, sashimi_plot_without_bams
 
 
@@ -127,7 +127,7 @@ def run_heatmap_module(args, parser_dict):
         # raise Exception('Please provide the list file that contains the path of the TSV result files!')
         parser_dict['heatmap'].print_help(sys.stderr)
     else:
-        plot_heatmap_pca(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
+        plot_heatmap_pca_mds(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
                  args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
                  args.aggregate, args.prefix, args.top, args.pdf, args.gene_list_file, plot_type='heatmap', method=args.method, metric=args.metric)
 
@@ -136,7 +136,7 @@ def run_pca_module(args, parser_dict):
         # raise Exception('Please provide the list file that contains the path of the TSV result files!')
         parser_dict['pca'].print_help(sys.stderr)
     else:
-        plot_heatmap_pca(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
+        plot_heatmap_pca_mds(Path(args.tsv_file), Path(args.meta_file), Path(args.out_dir), args.p_value,
                  args.q_value, args.dpsi, args.fold_change, args.avg, args.unsupervised,
                  args.aggregate, args.prefix, args.top, args.pdf, args.gene_list_file, plot_type='pca', metric=args.metric, color_shape_col=args.color_shape_col, label_point=args.label_point, filter_name_list=args.highlight_idlist_file)
 

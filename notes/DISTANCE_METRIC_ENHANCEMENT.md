@@ -50,15 +50,6 @@ python jutils.py pca --tsv-file data.tsv --meta-file meta.tsv --metric euclidean
 python jutils.py pca --tsv-file data.tsv --meta-file meta.tsv --metric cityblock
 ```
 
-### Other Supported Distance Metrics
-Both heatmap and PCA now support these distance metrics:
-- `cityblock` (Manhattan/L1 distance)
-- `euclidean` (L2 distance)
-- `correlation`, `cosine`
-- `chebyshev`, `canberra`
-- `hamming`, `jaccard`
-- And many others as supported by scipy.spatial.distance
-
 ## Output File Naming
 - PCA with euclidean metric: `{prefix}_pca.pc1-2.png`
 - PCA with other metrics: `{prefix}_mds-{metric}.pc1-2.png`

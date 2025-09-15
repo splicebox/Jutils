@@ -50,7 +50,7 @@ def parse_gene_list(gene_list_file):
                 gene_list.append(line.strip())
     return gene_list
 
-def plot_heatmap_pca(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
+def plot_heatmap_pca_mds(file, meta_file, out_dir, p_value_threshold, q_value_threshold,
                  dpsi_threshold, foldchange_threshold, avg_threshold,
                  unsupervised, aggregate, prefix, top, pdf, gene_list_file, plot_type, method=None, metric=None, color_shape_col=None, label_point=None, filter_name_list=''):
     check_thresholds(p_value_threshold, q_value_threshold, dpsi_threshold)
@@ -336,7 +336,6 @@ def generate_heatmaps(data_df, original_columns, conditions, sample_cond_dict,
     #from scipy.cluster.hierarchy import linkage
     #link = linkage(data_df.T)
     #link[-1][[0, 1]] = link[-1][[1, 0]]
-    #import pdb;pdb.set_trace()
     #figure = sns.clustermap(data_df, cmap="RdBu_r", col_linkage=link, z_score=0, vmin=-5, vmax=5,
     #                        metric=metric, method=method, mask=mask,
     #                        yticklabels=1, xticklabels=1, figsize=(figureWidth, figureHeight),dendrogram_ratio=(0.2,dendrogram_height_ratio),cbar_pos=(0.02, 1-dendrogram_height_ratio, .02, .03), **clustermapParams)
@@ -424,8 +423,8 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
     # Use PCA for euclidean distance, MDS for other distance metrics
     if metric == 'euclidean':
         # Standard PCA
-        pca = PCA(n_components=3)
-        principalComponents = pca.fit_transform(data_for_analysis)
+        pca = PCA(n_components=5)
+        multivariateComponents = pca.fit_transform(data_for_analysis)
         method_name = 'PCA'
     else:
         # Use MDS with specified distance metric
@@ -433,11 +432,11 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
         distance_matrix = squareform(pdist(data_for_analysis, metric=metric))
         
         # Perform MDS
-        mds = MDS(n_components=3, dissimilarity='precomputed', random_state=42)
-        principalComponents = mds.fit_transform(distance_matrix)
+        mds = MDS(n_components=5, dissimilarity='precomputed', random_state=42)
+        multivariateComponents = mds.fit_transform(distance_matrix)
         method_name = f'MDS-{metric}'
     
-    principalDf = pd.DataFrame(data = principalComponents, columns = ['PC1', 'PC2', 'PC3'])
+    principalDf = pd.DataFrame(data = multivariateComponents, columns = ['PC1', 'PC2', 'PC3','PC4','PC5'])
     meta_df_reset_index=meta_df.reset_index()
     if filter_name_list:
         filter_name_list_df=pd.read_csv(filter_name_list,header=None)
@@ -445,13 +444,17 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
     finalDf = pd.concat([principalDf, meta_df_reset_index.drop(['index'],axis=1)], axis = 1)
     
 
-
-    for x,y in [(1,2),(1,3),(2,3)]:
+    pc_pairs=[(1,2),(1,3),(2,3),(1,4),(1,5)]
+    for x,y in pc_pairs:
         fig = plt.figure(figsize = (8,8))
         ax = fig.add_subplot(1,1,1)
-        ax.set_xlabel(f'PC{x}', fontsize = 20)
-        ax.set_ylabel(f'PC{y}', fontsize = 20)
         ax.set_title(f'{method_name}', fontsize = 25)
+        if method_name=='PCA':
+            ax.set_xlabel(f'PC{x}', fontsize = 20)
+            ax.set_ylabel(f'PC{y}', fontsize = 20)
+        else:
+            ax.set_xlabel(f'PCoA{x}', fontsize = 20)
+            ax.set_ylabel(f'PCoA{y}', fontsize = 20)
 
         colors=sns.color_palette("tab10")
         cond_sorted_rev=sorted(conditions_unique,reverse=True)
@@ -470,7 +473,8 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
                 markers[groups_unique[i]]=next(markers_cycle)
 
         for i in range(n_targets):
-            indicesToKeep = (finalDf.iloc[:,4:] == targets[i]).sum(axis=1) == meta_col_n-1
+            cov_col_start_idx=len(pc_pairs)+1  #  pc cols plus sample_id col
+            indicesToKeep = (finalDf.iloc[:,cov_col_start_idx:] == targets[i]).sum(axis=1) == meta_col_n-1
             if filter_name_list:
                 indicesToKeep.iloc[filter_name_list_reset_index] = False
             x_pos=finalDf.loc[indicesToKeep, f'PC{x}']
@@ -523,7 +527,7 @@ def generate_pca(data_df, original_columns, meta_file, prefix, aggregate, unsupe
         method_suffix = 'pca' if metric == 'euclidean' else f'mds-{metric}'
 
         format = 'pdf' if pdf else 'png'
-        fig.savefig(out_dir/'_'.join(filter(None, strings + [f'{method_suffix}.pc{x}-{y}.{format}'])))
+        fig.savefig(out_dir/'_'.join(filter(None, strings + [f'{method_suffix}.{x}-{y}.{format}'])))
 
 
 def get_preset_palette():

@@ -119,7 +119,7 @@ python3 jutils.py pca --tsv-file <tsv_file> --meta-file <meta_file> [options]
         --highlight-idlist-file  list of highlighted sample(s) (one sample name per line without space) for pca
 ```
 
-The command generates PCA plots of PC1-2, PC1-3, and PC2-3. The option `--color-shape-col` can change the colours and shapes of points by specific columns. By default (2,3), column 2, namely the condition, specifies the colours and column 3, the (optional) covariate column specifies the shapes. The option `--label-point` annotates sample names from the meta file to the points. For details about the filter options, please refer to the section on _heatmaps_ above.
+The command generates PCA/PCoA plots for 1-2, 1-3, 2-3, 1-4 and 1-5 pairs using euclidean metric by default. If alternative distance metrics are specified, the command switches to MDS. The option `--color-shape-col` can change the colours and shapes of points by specific columns. By default (2,3), column 2, namely the condition, specifies the colours and column 3, the (optional) covariate column specifies the shapes. The option `--label-point` annotates sample names from the meta file to the points. For details about the filter options, please refer to the section on _heatmaps_ above.
 
 Test run pca with test data:
 ```
