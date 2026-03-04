@@ -8,6 +8,12 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+import warnings
+warnings.filterwarnings(
+    'ignore',
+    message='invalid value encountered in divide',
+    category=RuntimeWarning
+)
 
 def convert_majiq_results(data_dir, out_dir):
     infile = None
@@ -322,11 +328,11 @@ def convert_mntjulip_DSR_results(data_dir, out_dir):
         index=[]
         psis_list=[]
         for i,r in group_data_df.iterrows():
-            index.append(f'{r[0]}_{r[1]}:{r[2]}-{r[3]}')
+            index.append(f"{r['group_id']}_{r['chrom']}:{r['start']}-{r['end']}")
             group_psi=[]
 
             for j in range(7+n_conds, 7+n_conds+n_conds):
-                psi_list=r[j].split(',')
+                psi_list=r.iloc[j].split(',')
                 group_psi.extend(psi_list)
             psis_list.append(group_psi)
         psis_df=pd.DataFrame(psis_list,index).round(decimals=6)
