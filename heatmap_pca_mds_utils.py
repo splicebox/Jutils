@@ -252,7 +252,7 @@ def process_data_supervised(data_df, samples, sample_cond_dict, conditions, orig
                 groups = data_df2.groupby(['index'])
                 data_df = groups.apply(lambda x: x.iloc[x['dPSI'].argmax()])
                 data_df = data_df.sort_values(by=['dPSI'], ascending=False)
-                data_df = data_df.drop(columns=['dPSI', 'index'])
+                data_df = data_df.drop(columns=['dPSI', 'index'], errors='ignore')
 
     elif 'log2FoldChange' in original_columns:
         if aggregate:
