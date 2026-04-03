@@ -166,7 +166,7 @@ def process_data_unsupervised(data_df, samples, original_columns, avg_threshold,
             groups = data_df2.groupby(['index'])
             data_df = groups.apply(lambda x: x.iloc[x['variance'].argmax()])
             data_df = data_df.sort_values(by=['variance'], ascending=False)
-            data_df = data_df.drop(columns=['variance', 'index'])
+            data_df = data_df.drop(columns=['variance', 'index'], errors='ignore')
 
     elif 'log2FoldChange' in original_columns:
         if aggregate:
