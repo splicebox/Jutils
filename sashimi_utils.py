@@ -98,7 +98,11 @@ def sashimi_plot_without_bams(tsv_file, meta_file, gtf, group_id, out_dir, prefi
     # Find set of junctions to perform shrink
     intersected_introns = None
     if shrink:
-        introns = (v for vs in bam_dict[strand].values() for v in zip(vs[2], vs[3]))
+        introns = (
+            (min(a, b), max(a, b))
+            for vs in bam_dict[strand].values()
+            for a, b in zip(vs[2], vs[3])
+        )
         intersected_introns = list(intersect_introns(introns))
 
     # *** PLOT *** Define plot height
@@ -258,7 +262,11 @@ def sashimi_plot_with_bams(bams, coordinate, gtf, out_dir, prefix, shrink, stran
         # Find set of junctions to perform shrink
         intersected_introns = None
         if shrink:
-            introns = (v for vs in bam_dict[strand].values() for v in zip(vs[2], vs[3]))
+            introns = (
+                (min(a, b), max(a, b))
+                for vs in bam_dict[strand].values()
+                for a, b in zip(vs[2], vs[3])
+            )
             intersected_introns = list(intersect_introns(introns))
 
         # *** PLOT *** Define plot height
@@ -431,7 +439,9 @@ def prepare_for_R(a, junctions, coord, m):
 
 
 def intersect_introns(data):
-    data = sorted(data)
+    data = sorted((min(a, b), max(a, b)) for a, b in data)
+    if not data:
+        return
     it = iter(data)
     a, b = next(it)
     for c, d in it:
@@ -448,40 +458,50 @@ def shrink_density(x, y, introns):
     new_x, new_y = [], []
     shift = 0
     start = 0
+    x_to_idx = {v: i for i, v in enumerate(x)}
     # introns are already sorted by coordinates
     for a, b in introns:
-        end = x.index(a) + 1
+        # Normalize intron bounds to keep length non-negative.
+        a, b = (a, b) if a <= b else (b, a)
+        if a not in x_to_idx or b not in x_to_idx:
+            continue
+        end = x_to_idx[a] + 1
         new_x += [int(i - shift) for i in x[start:end]]
         new_y += y[start: end]
-        start = x.index(b)
-        l = (b - a)
-        shift += l - l**0.7
+        start = x_to_idx[b]
+        l = b - a
+        shift += l - int(l ** 0.7)
     new_x += [int(i - shift) for i in x[start:]]
     new_y += y[start:]
     return new_x, new_y
 
 
 def shrink_junctions(dons, accs, introns):
-    new_dons, new_accs = [0] * len(dons), [0] * len(accs)
+    norm_introns = [(min(a, b), max(a, b)) for a, b in introns]
+    shifts = []
     real_introns = dict()
-    shift_acc = 0
-    shift_don = 0
-    s = set()
-    junctions = list(zip(dons, accs))
-    for a, b in introns:
+    cumulative_shift = 0
+
+    for a, b in norm_introns:
         l = b - a
-        shift_acc += l - int(l ** 0.7)
-        real_introns[a - shift_don] = a
-        real_introns[b - shift_acc] = b
-        for i, (don, acc) in enumerate(junctions):
-            if a >= don and b <= acc:
-                if (don, acc) not in s:
-                    new_dons[i] = don - shift_don
-                    new_accs[i] = acc - shift_acc
-                else:
-                    new_accs[i] = acc - shift_acc
-                s.add((don,acc))
-        shift_don = shift_acc
+        delta = l - int(l ** 0.7)
+        # Left boundary uses previous cumulative shift; right includes current intron shrink.
+        real_introns[a - cumulative_shift] = a
+        cumulative_shift += delta
+        real_introns[b - cumulative_shift] = b
+        shifts.append((b, cumulative_shift))
+
+    def shift_coord(coord):
+        shift = 0
+        for intron_end, cumulative in shifts:
+            if intron_end <= coord:
+                shift = cumulative
+            else:
+                break
+        return coord - shift
+
+    new_dons = [shift_coord(don) for don in dons]
+    new_accs = [shift_coord(acc) for acc in accs]
     return real_introns, new_dons, new_accs
 
 
